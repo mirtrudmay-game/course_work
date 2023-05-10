@@ -1,63 +1,37 @@
 import { observer } from "mobx-react-lite";
 import React, { useEffect, useState } from "react";
-import { Button, Col, Container, Row } from "react-bootstrap";
-import { Filter } from "../components/Filter";
-import EventsList from "../components/GroupsList";
-import { eventsStore } from "../store/EventsStore";
-import CreateEventModal from "../components/CreateEventModal";
-import CreateInviteModal from "../components/CreateInviteModal";
+import {Button, Col, Container, Nav, Row} from "react-bootstrap";
+import {Boxes} from "../components/Boxes";
+
 
 const App = () => {
-    useEffect(() => {
-        eventsStore.loadAllEvents().then(console.error);
-    }, []);
-
-    const [isEventModalVisible, setEventModalVisible] = useState<boolean>(false);
-    const [isInviteModalVisible, setInviteModalVisible] = useState<boolean>(false);
-
-    const onCreateEventClickHandle = () => {
-        setEventModalVisible(true);
-    };
-
-    const onInviteEventClickHandle = () => {
-        setInviteModalVisible(true);
-    };
-
-    function onHideCreateEventModal() {
-        setEventModalVisible(false);
-    }
-
-    function onHideCreateInvitationModal() {
-        setInviteModalVisible(false);
-    }
-
     return (
-        <Container className="p-3">
-            <Row className="mb-2">
-                <Col xs={2}>
-                    <Button className={"w-100"} onClick={onCreateEventClickHandle}>
-                        Создать встречу
-                    </Button>
-                </Col>
-            </Row>
-            <Row>
-                <Col xs={2}>
-                    <Button className={"w-100"} onClick={onInviteEventClickHandle}>
-                        Создать приглашение
-                    </Button>
-                </Col>
-            </Row>
-            <Row>
-                <Col xs={4}>
-                    <EventsList data={eventsStore.groupsList} />
-                </Col>
-                <Col>
-                    <Filter />
-                </Col>
-            </Row>
-            <CreateEventModal isShow={isEventModalVisible} onHide={onHideCreateEventModal} />
-            <CreateInviteModal isShow={isInviteModalVisible} onHide={onHideCreateInvitationModal} />
-        </Container>
+        <>
+            <Nav
+                activeKey="/home"
+                onSelect={(selectedKey) => alert(`selected ${selectedKey}`)}
+            >
+                <Nav.Item>
+                    <Nav.Link eventKey="home">Главная</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                    <Nav.Link eventKey="new">Новое бронирование</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                    <Nav.Link eventKey="boxes">Боксы</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                    <Nav.Link eventKey="clients">Клиенты</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                    <Nav.Link eventKey="models">Модели</Nav.Link>
+                </Nav.Item>
+            </Nav>
+            <Container>
+                <Boxes></Boxes>
+            </Container>
+        </>
+
     );
 };
 

@@ -8,17 +8,9 @@ export default ({ mode }) => {
         plugins: [react()],
         server: {
             proxy: {
-                "/calendar-service/api": {
-                    target: "http://localhost:8081",
-                    rewrite: (path) => path.replace("/calendar-service", ""),
-                },
-                "/events-service/api": {
-                    target: "http://localhost:8083",
-                    rewrite: (path) => path.replace("/events-service", ""),
-                },
-                "/invitations-service/api": {
-                    target: "http://localhost:8085",
-                    rewrite: (path) => path.replace("/invitations-service", ""),
+                "/data-service/api": {
+                    target: "http://localhost:8080",
+                    rewrite: (path) => path.replace("/data-service", ""),
                 },
             },
         },
