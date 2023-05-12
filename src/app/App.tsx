@@ -1,37 +1,23 @@
-import { observer } from "mobx-react-lite";
-import React, { useEffect, useState } from "react";
-import {Button, Col, Container, Nav, Row} from "react-bootstrap";
-import {Boxes} from "../components/Boxes";
-
+import {observer} from "mobx-react-lite";
+import React from "react";
+import {Clients} from "../containers/Clients";
+import {BrowserRouter, Routes, Route} from "react-router-dom";
+import {Root} from "./Root";
+import Boxes from "../containers/boxes/Boxes";
 
 const App = () => {
     return (
-        <>
-            <Nav
-                activeKey="/home"
-                onSelect={(selectedKey) => alert(`selected ${selectedKey}`)}
-            >
-                <Nav.Item>
-                    <Nav.Link eventKey="home">Главная</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                    <Nav.Link eventKey="new">Новое бронирование</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                    <Nav.Link eventKey="boxes">Боксы</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                    <Nav.Link eventKey="clients">Клиенты</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                    <Nav.Link eventKey="models">Модели</Nav.Link>
-                </Nav.Item>
-            </Nav>
-            <Container>
-                <Boxes></Boxes>
-            </Container>
-        </>
+        <React.StrictMode>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" element={<Root />} >
+                        <Route index element={<Boxes/> } />
+                        <Route path="clients" element={<Clients />} />
+                    </Route>
+                </Routes>
+            </BrowserRouter>
 
+        </React.StrictMode>
     );
 };
 
