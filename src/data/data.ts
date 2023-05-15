@@ -1,4 +1,22 @@
-import {ICreateBox, IModel, ITableViewBox} from "../types/types";
+import {IModel, IBoxView, IClient} from "../types/types";
+
+export const clients: IClient[] = [
+    {
+        id_renter: 10,
+        full_name: "Петров Петр Петрович",
+        receipt_number: 110,
+        phone: "+7(910)277-33-73",
+        address: "petrov@gmail.com"
+    },
+    {
+        id_renter: 11,
+        full_name: "Карпов Карп Поликарпович",
+        receipt_number: 115,
+        phone: "+7(905)111-19-73",
+        address: "karp@gmail.com"
+    }
+];
+
 
 export const models: IModel[] = [
     {
@@ -19,18 +37,21 @@ export const models: IModel[] = [
     }
 ]
 
-export const boxes: ITableViewBox[] = [
+export const boxes: IBoxView[] = [
     {
         sequenceNumber: 100,
         modelName: models[0].name,
         dailyCoast: 1200,
-        currentRent: 155255,
     },
     {
         sequenceNumber: 105,
         modelName: models[1].name,
         dailyCoast: 1000,
-        currentRent: 155300,
+    },
+    {
+        sequenceNumber: 106,
+        modelName: models[2].name,
+        dailyCoast: 800,
     }
 ]
 
@@ -46,9 +67,5 @@ export const columns = [
         {
             Header: 'Стоимость (руб / сутки)',
             accessor: 'dailyCoast',
-        },
-        {
-            Header: 'Текущая аренда (№ квитанции)',
-            accessor: 'currentRent',
         },
     ]

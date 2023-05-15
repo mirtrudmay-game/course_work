@@ -1,17 +1,13 @@
-import {Column, useRowSelect, useTable} from 'react-table';
-import BTable from 'react-bootstrap/Table';
+import {IClient} from "../../types/types";
 import {FC} from "react";
-import {IBoxView} from "../../types/types";
-import {boxesStore} from "../../store/BoxesStore"
-import {observer} from "mobx-react-lite";
-import {IndeterminateCheckbox} from "./IndeterminateCheckbox";
+import {ITable} from "../boxes/BoxesTable";
+import {useRowSelect, useTable} from "react-table";
+import {boxesStore} from "../../store/BoxesStore";
+import {IndeterminateCheckbox} from "../boxes/IndeterminateCheckbox";
+import BTable from "react-bootstrap/Table";
 
-export interface ITable {
-    columns: Column[];
-    data: IBoxView[];
-}
 
-const BoxesTable: FC<ITable> = ({columns, data}) => {
+export const ClientsTable:FC<ITable> = ({ data, columns}) => {
     const {
         getTableProps,
         getTableBodyProps,
@@ -25,11 +21,6 @@ const BoxesTable: FC<ITable> = ({columns, data}) => {
             stateReducer: (newState, action) => {
                 if (action.type === "toggleRowSelected") {
                     boxesStore.setSelectedBoxes(newState.selectedRowIds);
-
-                    // Только одна строка.
-                    /*newState.selectedRowIds = {
-                        [action.id]: true
-                    }*/
                 }
 
                 return newState;
@@ -84,7 +75,3 @@ const BoxesTable: FC<ITable> = ({columns, data}) => {
         </BTable>
     )
 }
-
-export default observer(BoxesTable);
-
-

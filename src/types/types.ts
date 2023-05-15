@@ -3,15 +3,23 @@ export interface IModel {
     name: string
 }
 
-export interface ICreateBox {
+export interface IBoxView {
+    sequenceNumber: number;
+    modelName: string;
+    dailyCoast: number;
+}
+
+export interface IBoxCreate {
     sequenceNumber: number;
     model: IModel;
     dailyCoast: number;
 }
 
-export interface ITableViewBox {
-    sequenceNumber: number;
-    modelName: string;
-    dailyCoast: number;
-    currentRent: number | null;
+
+export interface IClient {
+    id_renter: number;
+    full_name: string;
+    phone: string;
+    address: string;
+    receipt_number: number;
 }
