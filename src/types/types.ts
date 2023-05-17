@@ -7,9 +7,10 @@ export interface IBoxView {
     sequenceNumber: number;
     modelName: string;
     dailyCoast: number;
+    // машина
 }
 
-export interface IBoxCreate {
+export interface IBox {
     sequenceNumber: number;
     model: IModel;
     dailyCoast: number;
@@ -17,9 +18,22 @@ export interface IBoxCreate {
 
 
 export interface IClient {
-    id_renter: number;
-    full_name: string;
+    idRenter: number;
+    fullName: string;
     phone: string;
     address: string;
-    receipt_number: number;
+    receiptNumber: number;
+}
+
+export interface ICar {
+    carNumber: number;
+    box: IBox;
+    renter: IClient;
+    model: IModel;
+    rentalStartDate: Date;
+}
+
+export interface IOption {
+    value: string;
+    label: string;
 }

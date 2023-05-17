@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import axios from "axios";
-import {IBoxCreate, IBoxView} from "../types/types";
+import {IBox, IBoxView} from "../types/types";
 import {boxes, models}  from "../data/data";
 
 interface IBoxesStore {
@@ -18,7 +18,7 @@ class BoxesStore implements IBoxesStore {
         makeAutoObservable(this);
     }
 
-    async loadBoxes(): Promise<void> {
+    async loadAll(): Promise<void> {
         try {
             const respose = await axios.get("/data-service/boxes/all");
 
@@ -30,7 +30,6 @@ class BoxesStore implements IBoxesStore {
         }
 
         this.boxesList = boxes;
-        console.log("loadBoxes", this.boxesList)
     }
 
     setSelectedBoxes (ids: Object) {
@@ -47,7 +46,7 @@ class BoxesStore implements IBoxesStore {
         }
     }
 
-    async saveNewBox(box: IBoxCreate): Promise<void> {
+    async saveNewBox(box: IBox): Promise<void> {
         console.log("saveNewBox", box);
         try {
             await axios.post("/data-service/boxes/add", box);

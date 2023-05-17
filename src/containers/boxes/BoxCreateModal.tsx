@@ -1,9 +1,9 @@
 // @flow
 import * as React from 'react';
-import {Button, Form, InputGroup, Modal} from "react-bootstrap";
-import {FC, useEffect, useState} from "react";
+import {FC, useEffect, useState} from 'react';
+import {Button, Form, Modal} from "react-bootstrap";
 import {boxesStore} from "../../store/BoxesStore";
-import {IBoxView, IModel} from "../../types/types";
+import {IModel, IOption} from "../../types/types";
 import {modelsStore} from "../../store/ModelsStore";
 import CreatableSelect from "react-select/creatable";
 import {observer} from "mobx-react-lite";
@@ -15,11 +15,6 @@ interface IBoxCreateModal {
 }
 
 export const NEW_MODEL = "-1";
-
-interface IOption {
-    value: string;
-    label: string;
-}
 
 const getOptions = (models: IModel[]): IOption[] => {
     return models.map((m) => ({"value": m.id.toString(), "label": m.name} as IOption))
@@ -97,15 +92,13 @@ const BoxCreateModal: FC<IBoxCreateModal> = ({show, closeCallback}) => {
 
                     <Form.Group className="mb-3">
                         <Form.Label>Модель</Form.Label>
-                        <InputGroup>
-                            <CreatableSelect
-                                isClearable
-                                onChange={(newValue) => setModel(newValue)}
-                                onCreateOption={handleCreate}
-                                value={model}
-                                options={getOptions(modelsStore.modelsList)}
-                            />
-                        </InputGroup>
+                        <CreatableSelect
+                            isClearable
+                            onChange={(newValue) => setModel(newValue)}
+                            onCreateOption={handleCreate}
+                            value={model}
+                            options={getOptions(modelsStore.modelsList)}
+                        />
                     </Form.Group>
 
                     <Form.Group className="mb-3">

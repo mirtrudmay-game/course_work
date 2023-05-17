@@ -1,49 +1,52 @@
-import {Column, useRowSelect, useTable} from 'react-table';
+import {Column, Row, useRowSelect, useTable} from 'react-table';
 import BTable from 'react-bootstrap/Table';
 import {FC} from "react";
-import {IBoxView} from "../../types/types";
+import {IBoxView, IClient} from "../../types/types";
 import {boxesStore} from "../../store/BoxesStore"
 import {observer} from "mobx-react-lite";
 import {IndeterminateCheckbox} from "./IndeterminateCheckbox";
 
 export interface ITable {
     columns: Column[];
-    data: IBoxView[];
+    data: IBoxView[] | IClient[];
+    selectRowCallback?: (id: number) => void;
+    onlyOneValue?: boolean;
 }
 
-const BoxesTable: FC<ITable> = ({columns, data}) => {
+const Table: FC<ITable> = ({columns, data, selectRowCallback, onlyOneValue}) => {
     const {
         getTableProps,
         getTableBodyProps,
         headerGroups,
         rows,
         prepareRow,
+        toggleRowSelected
     } = useTable(
         {
             columns,
             data,
             stateReducer: (newState, action) => {
-                if (action.type === "toggleRowSelected") {
-                    boxesStore.setSelectedBoxes(newState.selectedRowIds);
+                if (onlyOneValue) {
+                    if (action.type === "toggleRowSelected") {
 
-                    // Только одна строка.
-                    /*newState.selectedRowIds = {
-                        [action.id]: true
-                    }*/
+                        newState.selectedRowIds = {
+                            [action.id]: action.value
+                        }
+                    }
+
                 }
 
                 return newState;
             },
         },
         useRowSelect,
-        hooks => {
-
+        /*hooks => {
             hooks.visibleColumns.push(columns => [
                 {
                     id: 'selection',
                     Header: ({getToggleAllRowsSelectedProps}) => (
                         <div>
-                            <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
+                            { !onlyOneValue && <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />}
                         </div>
                     ),
 
@@ -55,8 +58,13 @@ const BoxesTable: FC<ITable> = ({columns, data}) => {
                 },
                 ...columns,
             ])
-        }
+        }*/
     )
+
+    function selectRowHandler(e: React.MouseEvent<HTMLTableRowElement>, row: Row) {
+        selectRowCallback?.(row.index);
+        toggleRowSelected(row.id, !row.isSelected);
+    }
 
     return (
         <BTable bordered {...getTableProps()}>
@@ -70,10 +78,10 @@ const BoxesTable: FC<ITable> = ({columns, data}) => {
             ))}
             </thead>
             <tbody {...getTableBodyProps()}>
-            {rows.slice(0, 10).map((row, i) => {
+            {rows.map((row, i) => {
                 prepareRow(row)
                 return (
-                    <tr {...row.getRowProps()}>
+                    <tr style={{background: row.isSelected ? "lightgrey" : "white" }} onClick={(e) => selectRowHandler(e, row)} {...row.getRowProps()}>
                         {row.cells.map(cell => {
                             return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
                         })}
@@ -85,6 +93,6 @@ const BoxesTable: FC<ITable> = ({columns, data}) => {
     )
 }
 
-export default observer(BoxesTable);
+export default observer(Table);
 
 

@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import axios from "axios";
-import {IModel, IBoxView, IClient} from "../types/types";
+import {IClient} from "../types/types";
 import {clients}  from "../data/data";
 
 interface IClientsStore {
@@ -25,7 +25,6 @@ class ClientsStore implements IClientsStore {
         } catch (e) {
 
         }
-
         this.clientsList = clients;
     }
 

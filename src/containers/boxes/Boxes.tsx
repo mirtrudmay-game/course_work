@@ -1,8 +1,8 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
-import {Button, ButtonToolbar, Container, Row} from "react-bootstrap";
-import BoxesTable from "./BoxesTable";
-import {columns} from "../../data/data";
+import {Button, ButtonToolbar, Col, Container, Row} from "react-bootstrap";
+import Table from "./Table";
+import {boxTableColumns} from "../../data/data";
 import {boxesStore} from "../../store/BoxesStore"
 import BoxCreateModal from "./BoxCreateModal";
 import {observer} from "mobx-react-lite";
@@ -12,10 +12,6 @@ import {IncreaseCoastModal} from "./IncreaseCoastModal";
 const Boxes = () => {
     const [showCreateBoxModal, setShowCreateBoxModal] = useState<boolean>(false);
     const [showIncreaseCoastModal, setShowIncreaseCoastModal] = useState<boolean>(false);
-
-    useEffect(() => {
-        boxesStore.loadBoxes().catch();
-    }, [])
 
     const createBoxClickHandler = () => {
         setShowCreateBoxModal(true);
@@ -40,15 +36,17 @@ const Boxes = () => {
     return (
         <>
             <Container>
-                <Row className="mb-5">
+                <Row className="my-4">
                     <ButtonToolbar>
-                        <Button size="lg" variant="success" className="me-2" onClick={createBoxClickHandler}>Добавить бокс</Button>
-                        <Button size="lg" variant="danger" className="me-2" onClick={removeBoxClickHandler}>Удалить бокс</Button>
-                        <Button size="lg" variant="outline-dark" className="me-2" onClick={increaseCoastClickHandler}>Увеличить стоимость аренды</Button>
+                        <Button  variant="success" className="me-2" onClick={createBoxClickHandler}>Добавить бокс</Button>
+                        <Button  variant="danger" className="me-2" onClick={removeBoxClickHandler}>Удалить бокс</Button>
+                        <Button  variant="outline-dark" className="me-2" onClick={increaseCoastClickHandler}>Увеличить стоимость аренды</Button>
                     </ButtonToolbar>
                 </Row>
                 <Row>
-                    <BoxesTable columns={columns} data={boxesStore.boxesList}/>
+                    <Col>
+                        <Table columns={boxTableColumns} data={boxesStore.boxesList}/>
+                    </Col>
                 </Row>
             </Container>
             <BoxCreateModal show={showCreateBoxModal} closeCallback={closeCreateBoxModalHandler}/>
