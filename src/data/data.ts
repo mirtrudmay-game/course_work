@@ -1,6 +1,6 @@
-import {IModel, IBoxView, IClient} from "../types/types";
+import {Model, Box, Renter} from "../types/types";
 
-export const clients: IClient[] = [
+export const clients: Renter[] = [
     {
         idRenter: 10,
         fullName: "Петров Петр Петрович",
@@ -18,7 +18,7 @@ export const clients: IClient[] = [
 ];
 
 
-export const models: IModel[] = [
+export const models: Model[] = [
     {
         name: "Ford",
         id: 100
@@ -37,7 +37,7 @@ export const models: IModel[] = [
     }
 ]
 
-export const boxes: IBoxView[] = [
+export const boxes: Box[] = [
     {
         sequenceNumber: 100,
         modelName: models[0].name,

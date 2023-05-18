@@ -1,21 +1,22 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import axios from "axios";
-import {IClient} from "../types/types";
+import {Renter} from "../types/types";
 import {clients}  from "../data/data";
 
 interface IClientsStore {
-    clientsList: IClient[];
+    clientsList: Renter[];
 }
 
 class ClientsStore implements IClientsStore {
-    clientsList: IClient[] = [];
+    clientsList: Renter[] = [];
 
     constructor() {
         makeAutoObservable(this);
     }
 
     async loadAll(): Promise<void> {
-        try {
+        this.clientsList = clients;
+/*        try {
             const response = await axios.get("/data-service/renters/all");
 
             runInAction(() => {
@@ -23,11 +24,14 @@ class ClientsStore implements IClientsStore {
             })
 
         } catch (e) {
+        }*/
 
-        }
-        this.clientsList = clients;
     }
 
+    getById(id: string | undefined): Renter | null {
+        if (!id) return null;
+        return this.clientsList.find((client) => client.idRenter === +id) || null;
+    }
 }
 
 export const clientsStore = new ClientsStore();

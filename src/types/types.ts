@@ -1,23 +1,22 @@
-export interface IModel {
+export interface Model {
     id: number;
     name: string
 }
 
-export interface IBoxView {
+export interface Box {
     sequenceNumber: number;
     modelName: string;
     dailyCoast: number;
-    // машина
 }
 
-export interface IBox {
+export interface BoxInput {
     sequenceNumber: number;
-    model: IModel;
+    model: Model;
     dailyCoast: number;
 }
 
 
-export interface IClient {
+export interface Renter {
     idRenter: number;
     fullName: string;
     phone: string;
@@ -25,15 +24,41 @@ export interface IClient {
     receiptNumber: number;
 }
 
-export interface ICar {
+export interface RenterInput {
+    idRenter: number | null;
+    fullName: string | null;
+    phone: string | null;
+    address: string | null;
+    receiptNumber: number | null;
+}
+
+export interface Car {
     carNumber: number;
-    box: IBox;
-    renter: IClient;
-    model: IModel;
+    box: BoxInput;
+    renter: Renter;
+    model: Model;
+    rentalStartDate: Date;
+}
+
+export interface CarInput {
+    carNumber: number | null;
+    box: BoxInput | null;
+    renter: Renter | null;
+    model: Model | null;
     rentalStartDate: Date;
 }
 
 export interface IOption {
     value: string;
     label: string;
+}
+
+export function getOptions<Obj, Key extends keyof Obj>(arr: Obj[], keyValue: Key, keyLabel: Key) {
+    return arr.map((el) => ({value: el[keyValue], label: el[keyLabel]} as IOption))
+}
+
+export function getOption<Obj, Key extends keyof Obj>(obj: Obj | null, keyValue: Key, keyLabel: Key) {
+    if (!obj) return {value: "", label: ""};
+
+    return {value: obj[keyValue], label: obj[keyLabel]} as IOption;
 }

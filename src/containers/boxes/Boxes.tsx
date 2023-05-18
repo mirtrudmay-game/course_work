@@ -7,6 +7,7 @@ import {boxesStore} from "../../store/BoxesStore"
 import BoxCreateModal from "./BoxCreateModal";
 import {observer} from "mobx-react-lite";
 import {IncreaseCoastModal} from "./IncreaseCoastModal";
+import {Box} from "../../types/types";
 
 
 const Boxes = () => {
@@ -45,7 +46,7 @@ const Boxes = () => {
                 </Row>
                 <Row>
                     <Col>
-                        <Table columns={boxTableColumns} data={boxesStore.boxesList}/>
+                        <Table<Box> columns={boxTableColumns} data={boxesStore.boxesList}/>
                     </Col>
                 </Row>
             </Container>

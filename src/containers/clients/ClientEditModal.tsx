@@ -1,17 +1,17 @@
 import * as React from 'react';
 import {Button, ButtonToolbar, Form, InputGroup, Modal} from "react-bootstrap";
 import {FC, useState} from "react";
-import {IClient} from "../../types/types";
+import {Renter} from "../../types/types";
 import {observer} from "mobx-react-lite";
 import InputMask from "react-input-mask";
 
 interface IClientEditModal {
     closeCallback: () => void;
-    initialData: IClient;
+    initialData: Renter;
 }
 
 const ClientEditModal: FC<IClientEditModal> = ({closeCallback, initialData}) => {
-    const [data, setData] = useState<IClient>(initialData);
+    const [data, setData] = useState<Renter>(initialData);
 
     function onHide() {
         closeCallback();

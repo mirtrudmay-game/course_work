@@ -5,7 +5,7 @@ import {clientsTableColumns} from "../../data/data";
 import {clientsStore} from "../../store/ClientsStore";
 import Table from "../boxes/Table";
 import {observer} from "mobx-react-lite";
-import {IClient} from "../../types/types";
+import {Renter} from "../../types/types";
 import ClientEditModal from "./ClientEditModal";
 import ErrorModal from "./ErrorModal";
 
@@ -14,7 +14,7 @@ const Clients = () => {
     const [showErrorModal, setShowErrorModal] = useState<boolean>(false);
 
 
-    const [selectedRow, setSelectedRow] = useState<IClient | null>(null);
+    const [selectedRow, setSelectedRow] = useState<Renter | null>(null);
 
 
     function openEditModal() {
@@ -34,8 +34,8 @@ const Clients = () => {
         setShowErrorModal(false);
     }
 
-    const selectRow = (id: number) => {
-        setSelectedRow(clientsStore.clientsList[id]);
+    const selectRow = (value: Renter) => {
+        setSelectedRow(value);
     };
 
     return (
@@ -48,7 +48,7 @@ const Clients = () => {
                 </Row>
                 <Row>
                     <Col>
-                        <Table columns={clientsTableColumns} data={clientsStore.clientsList} selectRowCallback={selectRow} onlyOneValue={true}/>
+                        <Table<Renter> columns={clientsTableColumns} data={clientsStore.clientsList} selectRowCallback={selectRow} onlyOneValue={true}/>
                     </Col>
                 </Row>
             </Container>

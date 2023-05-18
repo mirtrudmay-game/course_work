@@ -1,19 +1,19 @@
 import {Column, Row, useRowSelect, useTable} from 'react-table';
 import BTable from 'react-bootstrap/Table';
 import {FC} from "react";
-import {IBoxView, IClient} from "../../types/types";
+import {Box, Renter} from "../../types/types";
 import {boxesStore} from "../../store/BoxesStore"
 import {observer} from "mobx-react-lite";
 import {IndeterminateCheckbox} from "./IndeterminateCheckbox";
 
-export interface ITable {
+export interface ITable<T> {
     columns: Column[];
-    data: IBoxView[] | IClient[];
-    selectRowCallback?: (id: number) => void;
+    data: T[];
+    selectRowCallback?: (value: T) => void;
     onlyOneValue?: boolean;
 }
 
-const Table: FC<ITable> = ({columns, data, selectRowCallback, onlyOneValue}) => {
+function Table<T extends Object> ({columns, data, selectRowCallback, onlyOneValue}: ITable<T>) {
     const {
         getTableProps,
         getTableBodyProps,
@@ -40,7 +40,7 @@ const Table: FC<ITable> = ({columns, data, selectRowCallback, onlyOneValue}) => 
             },
         },
         useRowSelect,
-        /*hooks => {
+/*        hooks => {
             hooks.visibleColumns.push(columns => [
                 {
                     id: 'selection',
@@ -62,7 +62,7 @@ const Table: FC<ITable> = ({columns, data, selectRowCallback, onlyOneValue}) => 
     )
 
     function selectRowHandler(e: React.MouseEvent<HTMLTableRowElement>, row: Row) {
-        selectRowCallback?.(row.index);
+        selectRowCallback?.(data[row.index]);
         toggleRowSelected(row.id, !row.isSelected);
     }
 

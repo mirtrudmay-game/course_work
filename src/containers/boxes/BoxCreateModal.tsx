@@ -3,7 +3,7 @@ import * as React from 'react';
 import {FC, useEffect, useState} from 'react';
 import {Button, Form, Modal} from "react-bootstrap";
 import {boxesStore} from "../../store/BoxesStore";
-import {IModel, IOption} from "../../types/types";
+import {getOptions, Model, IOption} from "../../types/types";
 import {modelsStore} from "../../store/ModelsStore";
 import CreatableSelect from "react-select/creatable";
 import {observer} from "mobx-react-lite";
@@ -15,10 +15,6 @@ interface IBoxCreateModal {
 }
 
 export const NEW_MODEL = "-1";
-
-const getOptions = (models: IModel[]): IOption[] => {
-    return models.map((m) => ({"value": m.id.toString(), "label": m.name} as IOption))
-}
 
 const BoxCreateModal: FC<IBoxCreateModal> = ({show, closeCallback}) => {
 
@@ -97,7 +93,7 @@ const BoxCreateModal: FC<IBoxCreateModal> = ({show, closeCallback}) => {
                             onChange={(newValue) => setModel(newValue)}
                             onCreateOption={handleCreate}
                             value={model}
-                            options={getOptions(modelsStore.modelsList)}
+                            options={getOptions(modelsStore.modelsList, "id", "name")}
                         />
                     </Form.Group>
 

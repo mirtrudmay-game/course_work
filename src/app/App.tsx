@@ -5,7 +5,7 @@ import {BrowserRouter, Route, Routes} from "react-router-dom";
 import {Navigation} from "../components/Navigation";
 import Boxes from "../containers/boxes/Boxes";
 import {DeleteRent} from "./DeleteRent";
-import {AddRent} from "./AddRent";
+import AddRent from "./AddRent";
 import {clientsStore} from "../store/ClientsStore";
 import {modelsStore} from "../store/ModelsStore";
 import {boxesStore} from "../store/BoxesStore";
