@@ -18,9 +18,30 @@ const ClientEditModal: FC<IClientEditModal> = ({closeCallback, initialData}) => 
     }
 
     function formChangeHandler(event: React.ChangeEvent<HTMLInputElement>) {
-        const { name, value } = event.target;
+        const {name, value} = event.target;
         setData({...data, [name]: value})
     }
+
+    function phoneBlurHandler() {
+        if (data.phone.includes('_')) setPhoneValidate(false);
+    }
+
+    function phoneFocusHandler() {
+        setPhoneValidate(true);
+    }
+
+    const phoneCustomStyles = {
+        control: (base, state) => ({
+            ...base,
+            borderColor: phoneValidate ? '#ddd' : 'red',
+            '&:hover': {
+                borderColor: state.isFocused ? '#ddd'
+                    : phoneValidate ? '#ddd' : 'red'
+            }
+        })
+    }
+
+    const [phoneValidate, setPhoneValidate] = useState(true);
 
 
     return (
@@ -43,13 +64,16 @@ const ClientEditModal: FC<IClientEditModal> = ({closeCallback, initialData}) => 
                     <Form.Group className="mb-3">
                         <Form.Label>Телефон</Form.Label>
                         <InputMask className="form-control"
-                            mask="+9(999) 999-9999"
-                            name={"phone"}
-                            value={data.phone}
-                            onChange={formChangeHandler}
+                                   styles={phoneCustomStyles}
+                                   mask="+9(999) 999-9999"
+                                   name={"phone"}
+                                   value={data.phone}
+                                   onChange={formChangeHandler}
+                                   onBlur={phoneBlurHandler}
+                                   onFocus={phoneFocusHandler}
                         />
 
-                        <Form.Control.Feedback type="invalid">Некорректное значение.</Form.Control.Feedback>
+                        {!phoneValidate && <div style={{color: "red"}}>Некорректное значение</div>}
                     </Form.Group>
 
                     <Form.Group className="mb-3">

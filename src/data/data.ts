@@ -1,4 +1,4 @@
-import {Model, Box, Renter} from "../types/types";
+import {Model, BoxTableView, Renter} from "../types/types";
 
 export const clients: Renter[] = [
     {
@@ -37,7 +37,7 @@ export const models: Model[] = [
     }
 ]
 
-export const boxes: Box[] = [
+export const boxes: BoxTableView[] = [
     {
         sequenceNumber: 100,
         modelName: models[0].name,

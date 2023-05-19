@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import axios from "axios";
-import { Model, Box} from "../types/types";
+import { Model, BoxTableView} from "../types/types";
 import {boxes, models}  from "../data/data";
 import {Mode} from "fs";
 

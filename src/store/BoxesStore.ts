@@ -1,18 +1,18 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import axios from "axios";
-import {BoxInput, Box} from "../types/types";
+import {BoxInput, BoxTableView} from "../types/types";
 import {boxes}  from "../data/data";
 
 interface IBoxesStore {
-    boxesList: Box[];
-    selectedBoxes: Box[];
-    freeBoxesByCurrentModel: Box[];
+    boxesList: BoxTableView[];
+    selectedBoxes: BoxTableView[];
+    freeBoxesByCurrentModel: BoxTableView[];
 }
 
 class BoxesStore implements IBoxesStore {
-    boxesList: Box[] = [];
-    selectedBoxes: Box[] = [];
-    freeBoxesByCurrentModel: Box[] = [];
+    boxesList: BoxTableView[] = [];
+    selectedBoxes: BoxTableView[] = [];
+    freeBoxesByCurrentModel: BoxTableView[] = [];
 
     constructor() {
         makeAutoObservable(this);

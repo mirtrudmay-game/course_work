@@ -1,7 +1,7 @@
 import {Column, Row, useRowSelect, useTable} from 'react-table';
 import BTable from 'react-bootstrap/Table';
 import {FC} from "react";
-import {Box, Renter} from "../../types/types";
+import {BoxTableView, Renter} from "../../types/types";
 import {boxesStore} from "../../store/BoxesStore"
 import {observer} from "mobx-react-lite";
 import {IndeterminateCheckbox} from "./IndeterminateCheckbox";

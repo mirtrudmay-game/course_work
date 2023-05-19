@@ -3,7 +3,7 @@ export interface Model {
     name: string
 }
 
-export interface Box {
+export interface BoxTableView {
     sequenceNumber: number;
     modelName: string;
     dailyCoast: number;
@@ -17,20 +17,20 @@ export interface BoxInput {
 
 
 export interface Renter {
-    idRenter: number;
+    idRenter: number | null;
     fullName: string;
     phone: string;
     address: string;
-    receiptNumber: number;
+    receiptNumber: number | null;
 }
 
-export interface RenterInput {
+/*export interface RenterInput {
     idRenter: number | null;
     fullName: string | null;
     phone: string | null;
     address: string | null;
     receiptNumber: number | null;
-}
+}*/
 
 export interface Car {
     carNumber: number;
@@ -43,7 +43,7 @@ export interface Car {
 export interface CarInput {
     carNumber: number | null;
     box: BoxInput | null;
-    renter: Renter | null;
+    renter: Renter;
     model: Model | null;
     rentalStartDate: Date;
 }
