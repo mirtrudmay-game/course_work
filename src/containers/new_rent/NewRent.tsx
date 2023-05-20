@@ -1,18 +1,15 @@
-import {Button, Container, Modal, Form} from "react-bootstrap";
-import CreatableSelect from "react-select/creatable";
 import * as React from "react";
-import {useDebugValue, useEffect, useState} from "react";
-import {getOptions, Car, Renter, IOption, getOption, CarInput, BoxTableView} from "../types/types";
-import {clientsStore} from "../store/ClientsStore";
-import {modelsStore} from "../store/ModelsStore";
-import Select, {OnChangeValue} from 'react-select'
+import {useState} from "react";
+import {BoxTableView, CarInput, getOption, getOptions, IOption, Renter} from "../../types/types";
+import {Button, Container, Form, Modal} from "react-bootstrap";
+import Table from "../../components/Table/Table";
+import {boxTableColumns} from "../../data/data";
+import {boxesStore} from "../../store/BoxesStore";
+import Select, {OnChangeValue} from "react-select";
+import {clientsStore} from "../../store/ClientsStore";
+import {modelsStore} from "../../store/ModelsStore";
+import CreatableSelect from "react-select/creatable";
 import InputMask from "react-input-mask";
-import Table from "../containers/boxes/Table";
-import {boxTableColumns} from "../data/data";
-import {boxesStore} from "../store/BoxesStore";
-import boxes from "../containers/boxes/Boxes";
-import {observer} from "mobx-react-lite";
-
 
 const initialRenterData: Renter = {
     idRenter: null,
@@ -21,7 +18,6 @@ const initialRenterData: Renter = {
     phone: '',
     receiptNumber: null
 }
-
 const initialCarData: CarInput = {
     carNumber: null,
     renter: initialRenterData,
@@ -32,6 +28,7 @@ const initialCarData: CarInput = {
 
 function SelectBoxModal() {
     const [selectedRow, setSelectedBox] = useState<BoxTableView>();
+
     function selectRowHandler(value: BoxTableView) {
         setSelectedBox(value);
     }
@@ -44,7 +41,8 @@ function SelectBoxModal() {
         <Modal size={"xl"} show={true}>
             <Modal.Header closeButton>Выбор бокса</Modal.Header>
             <Modal.Body>
-                <Table<BoxTableView> columns={boxTableColumns} data={boxesStore.freeBoxesByCurrentModel} selectRowCallback={selectRowHandler} onlyOneValue={true}/>
+                <Table<BoxTableView> columns={boxTableColumns} data={boxesStore.freeBoxesByCurrentModel}
+                                     selectRowCallback={selectRowHandler} onlyOneValue={true}/>
             </Modal.Body>
             <Modal.Footer>
                 <Button onClick={createRent}></Button>
@@ -54,7 +52,7 @@ function SelectBoxModal() {
     )
 }
 
-const AddRent = () => {
+export const NewRent = () => {
     const [car, setCar] = useState<CarInput>(initialCarData);
     const [isClientEditable, setClientEditable] = useState<boolean>(false);
     const [showFreeBoxes, setShowFreeBoxes] = useState(false);
@@ -65,7 +63,7 @@ const AddRent = () => {
     const [carNumberValidate, setCarNumberValidate] = useState(true);
 
 
-    async function handleSubmit (event:  React.FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -90,7 +88,7 @@ const AddRent = () => {
 
     function selectRenterHandler(newValue: OnChangeValue<IOption, false>) {
         const renterData = clientsStore.getById(newValue?.value);
-        setCar({...car, renter: renterData || initialRenterData });
+        setCar({...car, renter: renterData || initialRenterData});
         setClientEditable(false);
     }
 
@@ -114,8 +112,9 @@ const AddRent = () => {
         control: (base, state) => ({
             ...base,
             borderColor: renterValidated ? '#ddd' : 'red',
-            '&:hover': { borderColor: state.isFocused ? '#ddd'
-                            : renterValidated ? '#ddd' : 'red'
+            '&:hover': {
+                borderColor: state.isFocused ? '#ddd'
+                    : renterValidated ? '#ddd' : 'red'
             }
         })
     }
@@ -124,7 +123,8 @@ const AddRent = () => {
         control: (base, state) => ({
             ...base,
             borderColor: modelValidated ? '#ddd' : 'red',
-            '&:hover': { borderColor: state.isFocused ? '#ddd'
+            '&:hover': {
+                borderColor: state.isFocused ? '#ddd'
                     : modelValidated ? '#ddd' : 'red'
             }
         })
@@ -153,7 +153,7 @@ const AddRent = () => {
                 <Form.Group className="mb-3">
                     <Form.Label>Клиент</Form.Label>
                     <CreatableSelect
-                        styles={ renterCustomStyles }
+                        styles={renterCustomStyles}
                         isClearable
                         name="renter"
                         value={getOption(car.renter, "idRenter", "fullName")}
@@ -194,7 +194,7 @@ const AddRent = () => {
                 <Form.Group className="mb-3">
                     <Form.Label>Модель</Form.Label>
                     <Select
-                        styles = {modelCustomStyles}
+                        styles={modelCustomStyles}
                         name="renter"
                         value={getOption(car.model, "id", "name")}
                         placeholder={"Название модели"}
@@ -222,9 +222,7 @@ const AddRent = () => {
                 </Button>
             </Form>
 
-            {showFreeBoxes && <SelectBoxModal />}
+            {showFreeBoxes && <SelectBoxModal/>}
         </Container>
     );
 }
-
-export default observer(AddRent);

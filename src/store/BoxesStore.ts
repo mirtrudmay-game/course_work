@@ -7,12 +7,14 @@ interface IBoxesStore {
     boxesList: BoxTableView[];
     selectedBoxes: BoxTableView[];
     freeBoxesByCurrentModel: BoxTableView[];
+    errorMessage: string;
 }
 
 class BoxesStore implements IBoxesStore {
     boxesList: BoxTableView[] = [];
     selectedBoxes: BoxTableView[] = [];
     freeBoxesByCurrentModel: BoxTableView[] = [];
+    errorMessage: string = "";
 
     constructor() {
         makeAutoObservable(this);
@@ -27,6 +29,7 @@ class BoxesStore implements IBoxesStore {
             })
 
         } catch (e: any) {
+            this.errorMessage = "Не удаётся получить список боксов."
         }
 
         this.boxesList = boxes;
@@ -42,6 +45,7 @@ class BoxesStore implements IBoxesStore {
             try {
                 await axios.post("/data-service/boxes/delete", box.sequenceNumber);
             } catch (e: any) {
+                this.errorMessage = "Не удаётся удалить бокс."
             }
         }
     }
@@ -50,7 +54,9 @@ class BoxesStore implements IBoxesStore {
         console.log("saveNewBox", box);
         try {
             await axios.post("/data-service/boxes/add", box);
-        } catch (e) {}
+        } catch (e) {
+            this.errorMessage = "Не удаётся сохранить бокс."
+        }
     }
 
 
@@ -58,7 +64,9 @@ class BoxesStore implements IBoxesStore {
         console.log("increaseCoast", coef)
         try {
             await axios.post(`/data-service/boxes/costUp/${coef}`);
-        } catch (e) {}
+        } catch (e) {
+            this.errorMessage = "Не удаётся выполнить операцию."
+        }
     }
 
     async loadFreeByModelId(id: number) {
@@ -72,6 +80,10 @@ class BoxesStore implements IBoxesStore {
         } catch (e) {}*/
 
         this.freeBoxesByCurrentModel = boxes.filter((b) => b.modelName == "Opel");
+    }
+
+    clearError() {
+        this.errorMessage = "";
     }
 }
 

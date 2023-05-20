@@ -3,11 +3,11 @@ import {useEffect, useRef, useState} from 'react';
 import {Button, ButtonToolbar, Col, Container, Row} from "react-bootstrap";
 import {clientsTableColumns} from "../../data/data";
 import {clientsStore} from "../../store/ClientsStore";
-import Table from "../boxes/Table";
+import Table from "../../components/Table/Table";
 import {observer} from "mobx-react-lite";
 import {Renter} from "../../types/types";
 import ClientEditModal from "./ClientEditModal";
-import ErrorModal from "./ErrorModal";
+import ErrorModal from "../../components/modals/ErrorModal";
 
 const Clients = () => {
     const [showEditModal, setShowEditModal] = useState<boolean>(false);

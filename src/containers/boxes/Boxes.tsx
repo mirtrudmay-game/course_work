@@ -1,13 +1,14 @@
 import * as React from 'react';
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {Button, ButtonToolbar, Col, Container, Row} from "react-bootstrap";
-import Table from "./Table";
+import Table from "../../components/Table/Table";
 import {boxTableColumns} from "../../data/data";
 import {boxesStore} from "../../store/BoxesStore"
-import BoxCreateModal from "./BoxCreateModal";
+import BoxCreateModal from "./NewBoxModal";
 import {observer} from "mobx-react-lite";
 import {IncreaseCoastModal} from "./IncreaseCoastModal";
 import {BoxTableView} from "../../types/types";
+import Register from "../../components/Test";
 
 
 const Boxes = () => {
@@ -41,7 +42,7 @@ const Boxes = () => {
                     <ButtonToolbar>
                         <Button  variant="success" className="me-2" onClick={createBoxClickHandler}>Добавить бокс</Button>
                         <Button  variant="danger" className="me-2" onClick={removeBoxClickHandler}>Удалить бокс</Button>
-                        <Button  variant="outline-dark" className="me-2" onClick={increaseCoastClickHandler}>Увеличить стоимость аренды</Button>
+                        <Button  variant="secondary" className="me-2" onClick={increaseCoastClickHandler}>Увеличить стоимость аренды</Button>
                     </ButtonToolbar>
                 </Row>
                 <Row>
@@ -50,8 +51,12 @@ const Boxes = () => {
                     </Col>
                 </Row>
             </Container>
-            <BoxCreateModal show={showCreateBoxModal} closeCallback={closeCreateBoxModalHandler}/>
-            <IncreaseCoastModal show={showIncreaseCoastModal} closeCallback={closeIncreaseCoastClickHandler}/>
+
+            {showCreateBoxModal && <BoxCreateModal closeCallback={closeCreateBoxModalHandler}/>}
+            {showIncreaseCoastModal && <IncreaseCoastModal closeCallback={closeIncreaseCoastClickHandler}/>}
+
+            {/*{successMessage && <SuccessModal message={successMessage}/>}
+            {boxesStore.errorMessage && <ErrorModal closeCallback={() => boxesStore.clearError()} message={boxesStore.errorMessage}/>}*/}
         </>
     );
 };

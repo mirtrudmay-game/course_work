@@ -4,11 +4,10 @@ import Clients from "../containers/clients/Clients";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import {Navigation} from "../components/Navigation";
 import Boxes from "../containers/boxes/Boxes";
-import {DeleteRent} from "./DeleteRent";
-import AddRent from "./AddRent";
 import {clientsStore} from "../store/ClientsStore";
 import {modelsStore} from "../store/ModelsStore";
 import {boxesStore} from "../store/BoxesStore";
+import {NewRent} from "../containers/new_rent/NewRent";
 
 const App = () => {
     useEffect(() => {
@@ -24,8 +23,7 @@ const App = () => {
                     <Route path="/" element={<Navigation />} >
                         <Route path="boxes" element={<Boxes/> } />
                         <Route path="clients" element={<Clients />} />
-                        <Route path="add-rent" element={<AddRent />} />
-                        <Route path="delete-rent" element={<DeleteRent />} />
+                        <Route path="add-rent" element={<NewRent />} />
                     </Route>
                 </Routes>
             </BrowserRouter>
