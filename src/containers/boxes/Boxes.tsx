@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
-import {Button, ButtonToolbar, Col, Container, Dropdown, Row} from "react-bootstrap";
+import {Button, ButtonToolbar, Col, Container, Row} from "react-bootstrap";
 import Table from "../../components/Table/Table";
 import {boxTableColumns} from "../../data/data";
 import {boxesStore} from "../../store/BoxesStore"
@@ -11,10 +11,12 @@ import {createTableViewBoxData, ITableViewBox} from "../../types/types";
 import ErrorModal from "../../components/modals/ErrorModal";
 import SuccessModal from "../../components/modals/SuccessModal";
 import {Tooltip} from "../../components/Tooltip";
+import {ReferencesModal} from "./ReferencesModal";
 
 const Boxes = () => {
     const [showCreateBoxModal, setShowCreateBoxModal] = useState<boolean>(false);
     const [showIncreaseCoastModal, setShowIncreaseCoastModal] = useState<boolean>(false);
+    const [showReferencesModal, setShowReferencesModal] = useState<boolean>(false);
 
     useEffect(() => {
         boxesStore.loadAll();
@@ -40,9 +42,18 @@ const Boxes = () => {
         setShowIncreaseCoastModal(true);
     }
 
-    const closeIncreaseCoastClickHandler = () => {
+    const closeIncreaseCoastModalHandler = () => {
         setShowIncreaseCoastModal(false);
     }
+
+    function referencesClickHandler() {
+        setShowReferencesModal(true);
+    }
+
+    function closeReferencesModalHandler() {
+        setShowReferencesModal(false);
+    }
+
 
     return (
         <>
@@ -64,25 +75,11 @@ const Boxes = () => {
                         </Tooltip>
 
 
-                        <Dropdown>
-                            <Tooltip text="Получить справку">
-                                <Dropdown.Toggle variant="outline-dark" className="me-2">
-                                    <i className="bi bi-filetype-xls"></i>
-                                </Dropdown.Toggle>
-                            </Tooltip>
-
-                            <Dropdown.Menu className={"mt-1"}>
-                                <Dropdown.Item href="#/action-1"><span className="py-2 px-2"><i
-                                    className="bi-download me-3"></i>О пустых боксах</span></Dropdown.Item>
-                                <Dropdown.Item href="#/action-3"><span className="py-2 px-2"><i
-                                    className="bi-download me-3"></i>О всех моделях
-                                    машин</span></Dropdown.Item>
-                                <Dropdown.Item href="#/action-2" disabled={!boxesStore.haveSelected}>
-                                    <span className="py-2 px-2"><i className="bi-download me-3"></i>
-                                        О клиенте, занимающем выбранный бокс</span></Dropdown.Item>
-
-                            </Dropdown.Menu>
-                        </Dropdown>
+                        <Tooltip text="Получить справку">
+                            <Button variant="outline-dark" onClick={referencesClickHandler} className="me-2">
+                                <i className="bi bi-filetype-xls"></i>
+                            </Button>
+                        </Tooltip>
                     </ButtonToolbar>
                 </Row>
                 <Row>
@@ -94,7 +91,8 @@ const Boxes = () => {
             </Container>
 
             {<BoxCreateModal show={showCreateBoxModal} closeCallback={closeCreateBoxModalHandler}/>}
-            {<IncreaseCoastModal show={showIncreaseCoastModal} closeCallback={closeIncreaseCoastClickHandler}/>}
+            {<IncreaseCoastModal show={showIncreaseCoastModal} closeCallback={closeIncreaseCoastModalHandler}/>}
+            {<ReferencesModal show={showReferencesModal} closeCallback={closeReferencesModalHandler}/>}
 
             {<SuccessModal show={!!boxesStore.successMessage} closeCallback={() => boxesStore.clearSuccessMessage()}
                            message={boxesStore.successMessage}/>}
