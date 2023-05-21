@@ -1,214 +1,168 @@
-// @flow
 import * as React from 'react';
-import {CSSProperties, FC, useEffect, useState} from 'react';
-import {Button, FormControl, FormGroup, FormLabel, FormSelect, Modal} from "react-bootstrap";
-import {boxesStore} from "../../store/BoxesStore";
-import {getOptions, Model, IOption} from "../../types/types";
+import {FC, useEffect, useState} from 'react';
+import {Button, Form, FormControl, FormGroup, FormLabel, FormSelect, Modal} from "react-bootstrap";
+import {ICreateBox, IOption} from "../../types/types";
 import {modelsStore} from "../../store/ModelsStore";
 import CreatableSelect from "react-select/creatable";
 import {observer} from "mobx-react-lite";
-import Select, {SingleValue} from "react-select";
+import {SingleValue} from "react-select";
 import {IModal} from "./IncreaseCoastModal";
-import {ErrorMessage, Form, Field, Formik, FormikValues} from "formik";
-import InputNumberField from "../../components/InputNumberField";
-import FormikSelect from "../../components/FormikSelect";
+import {boxesStore} from "../../store/BoxesStore";
 
-interface CreateBoxValues {
-    sequenceNumber: string;
+
+interface ICreateBoxError {
+    boxNumber: string;
     model: string;
     dailyCoast: string;
 }
 
-interface CreateBoxErrors {
-    sequenceNumber: string;
-    model: string;
-    dailyCoast: string;
-}
-
-
-const NewBoxModal: FC<IModal> = ({closeCallback}) => {
-    const [modelOptions, setModelOptions] = useState<IOption[]>();
-
-    const loadModels = async () => {
-        await modelsStore.loadAll();
-        const models: Model[] = modelsStore.modelsList;
-        const options: IOption[] = models.map((model): IOption => ({
-            value: model.id.toString(),
-            label: model.name
-        }));
-        setModelOptions(options);
+const CreateBoxModal: FC<IModal> = ({show, closeCallback}) => {
+    const initialData: ICreateBox = {
+        boxNumber: '',
+        model: {
+            value: '',
+            label: ''
+        },
+        dailyCoast: ''
     }
+
+    const initialErrors: ICreateBoxError = {
+        boxNumber: '',
+        model: '',
+        dailyCoast: ''
+    }
+
+    const [models, setModels] = useState<IOption[]>();
+    const [data, setData] = useState<ICreateBox>(initialData);
+    const [errors, setErrors] = useState<ICreateBoxError>(initialErrors);
 
     useEffect(() => {
-        loadModels();
+        modelsStore.loadAll().then(() => {
+            const options: IOption[] =
+                modelsStore.modelsList.map((model): IOption => ({
+                    value: model.id.toString(),
+                    label: model.name
+                }));
+
+            setModels(options);
+        });
+
     }, []);
 
-
-
-/*    const modelCustomStyles = {
-        // @ts-ignore
-        control: (base, state) => ({
-            ...base,
-            borderColor: modelValid ? '#ddd' : '#dc3545',
-            '&:hover': {
-                borderColor: state.isFocused ? '#ddd'
-                    : modelValid ? '#ddd' : '#dc3545'
-            }
-        })
-    }*/
-
-    const initialState: CreateBoxValues = {dailyCoast: '', model: '', sequenceNumber: ''}
-    const validate = (values: FormikValues) => {
-        const errors = {};
-
-        if (!values.sequenceNumber) {
-            errors.sequenceNumber = 'Введите номер бокса';
+    const onChangeValidate = (name: string, value: string | SingleValue<IOption>) => {
+        if (["boxNumber", "dailyCoast"].includes(name)) {
+            if (value && isNaN(+value)) return "Некорректное значение";
         }
-        if (!values.model) {
-            errors.model = 'First Name is required';
-        }
-        if (!values.dailyCoast) {
-            errors.dailyCoast = 'Введите стоимость аренды';
-        }
-        return errors;
+        return '';
     }
 
-    const onSubmit = (values: FormikValues) => {
-        /*await boxesStore.saveNewBox({
-            sequenceNumber: values.sequenceNumber,
-            model: {id: +model!.value, name: model!.label},
-            dailyCoast: +dailyCoast
-        });*/
+    const onChange = (name: string, value: string | SingleValue<IOption>) => {
+        const err = onChangeValidate(name, value);
+        setErrors({...errors, [name]: err});
+
+        if (name === "model" && typeof value === "string") {
+            setData({
+                ...data, model: {
+                    value: '',
+                    label: value
+                }
+            });
+            return;
+        }
+
+        setData({...data, [name]: value});
+    };
+
+    const onClose = () => {
+        setData(initialData);
+        setErrors(initialErrors);
         closeCallback();
     }
 
+    const isValid = () =>  {
+        const _errors = Object.assign({}, errors);
+        if (!data.boxNumber) _errors.boxNumber = "Введите значение";
+        if (!data.model.label) _errors.model = "Введите значение";
+        if (!data.dailyCoast) _errors.dailyCoast = "Введите значение";
+
+        setErrors(_errors);
+        return !Object.values(_errors).filter((v) => v).length;
+    }
+
+    const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        if (isValid()) {
+            await boxesStore.saveNewBox(data)
+            onClose();
+        }
+    }
+
+
+    const modelCustomStyles = {
+        // @ts-ignore
+        control: (base, state) => ({
+            ...base,
+            borderColor: errors.model ? '#dc3545': '#ddd',
+            '&:hover': {
+                borderColor: state.isFocused ? '#ddd'
+                    : errors.model ? '#dc3545': '#ddd'
+            }
+        })
+    }
+
+
     return (
-        <Modal show={true} onHide={closeCallback}>
+        <Modal show={show} onHide={closeCallback}>
             <Modal.Header closeButton>
                 <Modal.Title>Добавить бокс</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Formik
-                    initialValues={initialState}
-                    validate={validate}
-                    onSubmit={values => {
-                        if (values.sequenceNumber && values.model && values.dailyCoast) {
-                            console.log('form submitted!!')
-                        }
-                    }}>
-
-                    {({handleChange, handleSubmit, handleBlur, values, errors, touched}) => (
-                       <Form onSubmit={handleSubmit}>
-                            <Field name="sequenceNumber" >
-                                {() => (
-                                    <FormGroup className={"mb-3"}  controlId="sequenceNumber">
-                                        <FormLabel> Номер бокса</FormLabel>
-                                        <FormControl
-                                            type={'text'}
-                                            value={values.sequenceNumber}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            isInvalid={!!(errors.sequenceNumber && touched.sequenceNumber)}
-                                            required
-                                        />
-                                        <FormControl.Feedback type="invalid">
-                                            {touched.sequenceNumber && errors.sequenceNumber}
-                                        </FormControl.Feedback>
-                                    </FormGroup>
-                                )}
-                            </Field>
-
-                           <Field name="model">
-                               {() => (
-                                   <FormGroup className={"mb-3"} controlId="model">
-                                       <FormLabel>Модель</FormLabel>
-                                       <FormSelect value={values.model}
-                                                   onChange={handleChange}
-                                                   onBlur={handleBlur}
-                                                   isInvalid={!!(errors.model && touched.model)}
-                                                   required>
-
-                                           {modelOptions?.map((option) => (
-                                               <option>{option.label}</option>
-                                           ))}
-                                       </FormSelect>
-
-                                       <FormControl.Feedback type="invalid">
-                                           {touched.model && errors.model}
-                                       </FormControl.Feedback>
-                                   </FormGroup>
-                               )}
-                           </Field>
-
-                           <Field name="dailyCoast" render={() => (
-                               <FormGroup className={"mb-3"} controlId="dailyCoast">
-                                   <FormLabel>Стоимость ареды (руб / сутки)</FormLabel>
-                                   <FormControl
-                                       type={'text'}
-                                       value={values.dailyCoast}
-                                       onChange={handleChange}
-                                       onBlur={handleBlur}
-                                       isInvalid={!!(errors.dailyCoast && touched.dailyCoast)}
-                                       required
-                                   />
-                                   <FormControl.Feedback type="invalid">
-                                       {touched.dailyCoast && errors.dailyCoast}
-                                   </FormControl.Feedback>
-                               </FormGroup>
-                           )}></Field>
-                            <Button type="submit">
-                                Отправить
-                            </Button>
-                        </Form>
-                    )}
-                </Formik>
-
-
-                {/* <Form noValidate onSubmit={handleSubmit}>
-                    <Form.Group className="mb-3">
-                        <Form.Label>Номер бокса</Form.Label>
-                        <Form.Control
-                            name="sequenceNumber"
-                            onChange={changeNumberHandler}
-                            value={boxNumber}
-                            isInvalid={!boxNumberValid}
+                <Form noValidate onSubmit={onSubmit}>
+                    <FormGroup className="mb-3">
+                        <FormLabel className="required">Номер бокса</FormLabel>
+                        <FormControl
+                            name="boxNumber"
+                            value={data.boxNumber}
+                            onChange={(e) => onChange(e.target.name, e.target.value)}
+                            isInvalid={!!errors.boxNumber}
                             type="text"
                             autoComplete={"off"}
                         />
-                        <Form.Control.Feedback type="invalid">Некорректный номер бокса.</Form.Control.Feedback>
-                    </Form.Group>
+                        <FormControl.Feedback type="invalid">{errors.boxNumber}</FormControl.Feedback>
+                    </FormGroup>
 
-                    <Form.Group className="mb-3">
-                        <Form.Label>Модель</Form.Label>
+                    <FormGroup className="mb-3">
+                        <FormLabel className="required">Модель</FormLabel>
                         <CreatableSelect
                             styles={modelCustomStyles}
                             isClearable
-                            onChange={(newValue) => changeModelHandler(newValue)}
-                            onCreateOption={handleCreate}
-                            value={model}
-                            options={getOptions(modelsStore.modelsList, "id", "name")}
+                            onChange={(newValue) => onChange("model", newValue)}
+                            onCreateOption={(newValue) => onChange("model", newValue)}
+                            value={data.model}
+                            options={models}
                         />
-                        {!modelValid &&
-                            <div style={{color: "#dc3545", fontSize: ".875em"}}>Введите название модели</div>}
-                    </Form.Group>
+                        {errors.model && <div style={{color: "#dc3545", fontSize: ".875em", marginTop: "5px"}}>{errors.model}</div>}
+                    </FormGroup>
 
-                    <Form.Group className="mb-3">
-                        <Form.Label>Стоимость (руб/сутки): </Form.Label>
-                        <Form.Control
+                    <FormGroup className="mb-3">
+                        <FormLabel className="required">Стоимость (руб/сутки) </FormLabel>
+                        <FormControl
                             name={"dailyCoast"}
-                            isInvalid={!dailyCoastValid}
-                            value={dailyCoast}
+                            value={data.dailyCoast}
+                            onChange={(e) => onChange(e.target.name, e.target.value)}
+                            isInvalid={!!errors.dailyCoast}
                             type="text"
-                            onChange={changeCoastHandler}/>
-                        <Form.Control.Feedback type="invalid">Некорректное значение.</Form.Control.Feedback>
-                    </Form.Group>
-
-                    <Button type="submit">Отправить</Button>
-                </Form>*/}
+                            autoComplete={"off"}/>
+                        <FormControl.Feedback type="invalid">{errors.dailyCoast}</FormControl.Feedback>
+                    </FormGroup>
+                    <Button type="submit" className={"me-2"}>Отправить</Button>
+                    <Button type="reset" variant={"secondary"} onClick={onClose}>Отмена</Button>
+                </Form>
             </Modal.Body>
 
         </Modal>
     );
 };
 
-export default observer(NewBoxModal);
+export default observer(CreateBoxModal);

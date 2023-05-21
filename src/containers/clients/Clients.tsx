@@ -1,60 +1,67 @@
 import * as React from 'react';
 import {useEffect, useRef, useState} from 'react';
-import {Button, ButtonToolbar, Col, Container, Row} from "react-bootstrap";
+import {Button, ButtonGroup, ButtonToolbar, Col, Container, Dropdown, Row} from "react-bootstrap";
 import {clientsTableColumns} from "../../data/data";
 import {clientsStore} from "../../store/ClientsStore";
 import Table from "../../components/Table/Table";
 import {observer} from "mobx-react-lite";
-import {Renter} from "../../types/types";
+import {createEditableRenterData, IRenter} from "../../types/types";
 import ClientEditModal from "./ClientEditModal";
-import ErrorModal from "../../components/modals/ErrorModal";
+import {Tooltip} from "../../components/Tooltip";
+import {boxesStore} from "../../store/BoxesStore";
 
 const Clients = () => {
     const [showEditModal, setShowEditModal] = useState<boolean>(false);
-    const [showErrorModal, setShowErrorModal] = useState<boolean>(false);
-
-
-    const [selectedRow, setSelectedRow] = useState<Renter | null>(null);
-
-
-    function openEditModal() {
-        if (selectedRow) {
-            setShowEditModal(true)
-            return;
-        }
-
-        setShowErrorModal(true);
-    }
 
     function closeEditModal() {
         setShowEditModal(false);
     }
 
-    function closeErrorModal() {
-        setShowErrorModal(false);
+    function openEditModal() {
+        setShowEditModal(true);
     }
 
-    const selectRow = (value: Renter) => {
-        setSelectedRow(value);
+    const selectRow = (indexes: Record<string, boolean>) => {
+        clientsStore.setSelectedClient(indexes);
     };
 
     return (
         <>
             <Container>
-                <Row className="my-4">
-                    <ButtonToolbar>
-                        <Button variant="outline-dark" onClick={openEditModal} className="me-2">Редактировать</Button>
-                    </ButtonToolbar>
-                </Row>
+                <ButtonToolbar className="my-4">
+                    <Tooltip text="Редактировать данные выбранного клиента" >
+                        <Button variant="outline-dark" className="me-2" disabled={!clientsStore.selectedClient} onClick={openEditModal}>
+                            <i className="bi-pen"></i></Button>
+                    </Tooltip>
+
+                    <Dropdown>
+                        <Tooltip text="Получить справку">
+                            <Dropdown.Toggle variant="outline-dark" className="me-2">
+                                <i className="bi bi-filetype-xls"></i>
+                            </Dropdown.Toggle>
+                        </Tooltip>
+
+
+                        <Dropdown.Menu>
+                            <Dropdown.Item href="#/action-1">О всех клиентах</Dropdown.Item>
+                            <Dropdown.Item href="#/action-2">О клиентах по марке автомобиля</Dropdown.Item>
+                            <Dropdown.Item href="#/action-3" disabled={!clientsStore.selectedClient}>О выбранном
+                                клиенте</Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </ButtonToolbar>
+
                 <Row>
                     <Col>
-                        <Table<Renter> columns={clientsTableColumns} data={clientsStore.clientsList} selectRowCallback={selectRow} onlyOneValue={true}/>
+                        <Table<IRenter> columns={clientsTableColumns} data={clientsStore.clientsList}
+                                        selectRowCallback={selectRow} onlyOneValue={true}/>
                     </Col>
                 </Row>
             </Container>
 
-            {showEditModal && selectedRow && <ClientEditModal closeCallback={closeEditModal} initialData={selectedRow} />}
-            {showErrorModal && <ErrorModal closeCallback={closeErrorModal} message={"Не выбрана объект для изменения. Выберите соответствующую строку в таблице."} />}
+            {clientsStore.selectedClient && showEditModal &&
+                <ClientEditModal show={showEditModal} closeCallback={closeEditModal}
+                                 initialData={createEditableRenterData(clientsStore.selectedClient)}/>}
         </>
     );
 };

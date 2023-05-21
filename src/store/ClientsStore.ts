@@ -1,14 +1,16 @@
-import { makeAutoObservable, runInAction } from "mobx";
+import {computed, makeAutoObservable, observable, runInAction} from "mobx";
 import axios from "axios";
-import {Renter} from "../types/types";
+import {IEditRenter, IRenter} from "../types/types";
 import {clients}  from "../data/data";
 
 interface IClientsStore {
-    clientsList: Renter[];
+    clientsList: IRenter[];
+    selectedClient: IRenter | null;
 }
 
 class ClientsStore implements IClientsStore {
-    clientsList: Renter[] = [];
+    clientsList: IRenter[] = [];
+    selectedClient: IRenter | null = null;
 
     constructor() {
         makeAutoObservable(this);
@@ -28,9 +30,26 @@ class ClientsStore implements IClientsStore {
 
     }
 
-    getById(id: string | undefined): Renter | null {
+    getById(id: string | undefined): IRenter | null {
         if (!id) return null;
         return this.clientsList.find((client) => client.idRenter === +id) || null;
+    }
+
+    setSelectedClient(indexes: Record<string, boolean>) {
+        const selected = Object.entries(indexes).filter(([key, value]) => value);
+
+        if (!selected.length) {
+            this.selectedClient = null;
+            return;
+        }
+
+        const idx = +selected[0][0];
+        this.selectedClient = this.clientsList[idx];
+
+    }
+
+    updateSelectedClient(data: IEditRenter) {
+        return false;
     }
 }
 

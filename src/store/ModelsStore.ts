@@ -1,15 +1,15 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import axios from "axios";
-import { Model, BoxTableView} from "../types/types";
+import { IModel, ITableViewBox} from "../types/types";
 import {boxes, models}  from "../data/data";
 import {Mode} from "fs";
 
 interface IModelsStore {
-    modelsList: Model[];
+    modelsList: IModel[];
 }
 
 class ModelsStore implements IModelsStore {
-    modelsList: Model[] = [];
+    modelsList: IModel[] = [];
 
     constructor() {
         makeAutoObservable(this);
@@ -34,7 +34,7 @@ class ModelsStore implements IModelsStore {
 
     }
 
-    getById(id: string | undefined): Model | null {
+    getById(id: string | undefined): IModel | null {
         if (!id) return null;
         return this.modelsList.find((model) => model.id === +id) || null;
     }

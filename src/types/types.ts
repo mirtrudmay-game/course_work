@@ -1,52 +1,87 @@
-export interface Model {
+/**
+ * Модель.
+ */
+
+export interface IModel {
     id: number;
     name: string
 }
 
-export interface BoxTableView {
-    sequenceNumber: number;
+
+/**
+ * Бокс.
+ */
+
+export interface IBox {
+    boxNumber: number;
+    model: IModel;
+    dailyCoast: number;
+}
+
+export interface ITableViewBox {
+    boxNumber: number;
     modelName: string;
     dailyCoast: number;
 }
 
-export interface BoxInput {
-    sequenceNumber: number;
-    model: Model;
-    dailyCoast: number;
+export const createTableViewBoxData = (box: IBox): ITableViewBox => {
+    return {
+        modelName: box.model.name,
+        boxNumber: box.boxNumber,
+        dailyCoast: box.dailyCoast
+    }
 }
 
 
-export interface Renter {
-    idRenter: number | null;
+export interface ICreateBox {
+    boxNumber: string;
+    model: IOption;
+    dailyCoast: string;
+}
+
+
+/**
+ * Клиент.
+ */
+
+export interface IRenter {
+    idRenter: number;
     fullName: string;
     phone: string;
     address: string;
-    receiptNumber: number | null;
+    receiptNumber: number;
 }
 
-/*export interface RenterInput {
-    idRenter: number | null;
-    fullName: string | null;
-    phone: string | null;
-    address: string | null;
-    receiptNumber: number | null;
-}*/
+export interface IEditRenter {
+    fullName: string;
+    phone: string;
+    address: string;
+}
 
-export interface Car {
+export const createEditableRenterData = (renter: IRenter): IEditRenter => {
+    return {
+        fullName: renter.fullName,
+        phone: renter.phone,
+        address: renter.address,
+    }
+}
+
+
+/*export interface Car {
     carNumber: number;
     box: BoxInput;
-    renter: Renter;
-    model: Model;
+    renter: IRenter;
+    model: IModel;
     rentalStartDate: Date;
 }
 
 export interface CarInput {
     carNumber: number | null;
     box: BoxInput | null;
-    renter: Renter;
-    model: Model | null;
+    renter: IRenter;
+    model: IModel | null;
     rentalStartDate: Date;
-}
+}*/
 
 export interface IOption {
     value: string;

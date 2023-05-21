@@ -1,6 +1,6 @@
-import {Model, BoxTableView, Renter} from "../types/types";
+import {IModel, IRenter, IBox} from "../types/types";
 
-export const clients: Renter[] = [
+export const clients: IRenter[] = [
     {
         idRenter: 10,
         fullName: "Петров Петр Петрович",
@@ -18,7 +18,7 @@ export const clients: Renter[] = [
 ];
 
 
-export const models: Model[] = [
+export const models: IModel[] = [
     {
         name: "Ford",
         id: 100
@@ -37,28 +37,29 @@ export const models: Model[] = [
     }
 ]
 
-export const boxes: BoxTableView[] = [
+export const boxes: IBox[] = [
     {
-        sequenceNumber: 100,
-        modelName: models[0].name,
+        boxNumber: 90,
+        model: models[0],
         dailyCoast: 1200,
     },
     {
-        sequenceNumber: 105,
-        modelName: models[1].name,
+        boxNumber: 105,
+        model: models[0],
         dailyCoast: 1000,
     },
     {
-        sequenceNumber: 106,
-        modelName: models[2].name,
+        boxNumber: 106,
+        model: models[0],
         dailyCoast: 800,
     }
 ]
 
+
 export const boxTableColumns = [
         {
             Header: 'Номер бокса',
-            accessor: 'sequenceNumber',
+            accessor: 'boxNumber',
         },
         {
             Header: 'Поддерживаемая марка',

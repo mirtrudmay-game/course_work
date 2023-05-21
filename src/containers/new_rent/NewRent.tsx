@@ -1,6 +1,6 @@
 import * as React from "react";
 import {useState} from "react";
-import {BoxTableView, CarInput, getOption, getOptions, IOption, Renter} from "../../types/types";
+import {ITableViewBox, CarInput, getOption, getOptions, IOption, IRenter} from "../../types/types";
 import {Button, Container, Form, Modal} from "react-bootstrap";
 import Table from "../../components/Table/Table";
 import {boxTableColumns} from "../../data/data";
@@ -11,7 +11,7 @@ import {modelsStore} from "../../store/ModelsStore";
 import CreatableSelect from "react-select/creatable";
 import InputMask from "react-input-mask";
 
-const initialRenterData: Renter = {
+const initialRenterData: IRenter = {
     idRenter: null,
     fullName: '',
     address: '',
@@ -27,9 +27,9 @@ const initialCarData: CarInput = {
 }
 
 function SelectBoxModal() {
-    const [selectedRow, setSelectedBox] = useState<BoxTableView>();
+    const [selectedRow, setSelectedBox] = useState<ITableViewBox>();
 
-    function selectRowHandler(value: BoxTableView) {
+    function selectRowHandler(value: ITableViewBox) {
         setSelectedBox(value);
     }
 
@@ -41,8 +41,8 @@ function SelectBoxModal() {
         <Modal size={"xl"} show={true}>
             <Modal.Header closeButton>Выбор бокса</Modal.Header>
             <Modal.Body>
-                <Table<BoxTableView> columns={boxTableColumns} data={boxesStore.freeBoxesByCurrentModel}
-                                     selectRowCallback={selectRowHandler} onlyOneValue={true}/>
+                <Table<ITableViewBox> columns={boxTableColumns} data={boxesStore.freeBoxesByCurrentModel}
+                                      selectRowCallback={selectRowHandler} onlyOneValue={true}/>
             </Modal.Body>
             <Modal.Footer>
                 <Button onClick={createRent}></Button>
@@ -81,7 +81,7 @@ export const NewRent = () => {
     }
 
     function createRenterHandler(inputValue: string) {
-        const renter: Renter = {...initialRenterData, fullName: inputValue}
+        const renter: IRenter = {...initialRenterData, fullName: inputValue}
         setCar({...car, renter: renter});
         setClientEditable(true);
     }

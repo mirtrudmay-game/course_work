@@ -4,10 +4,11 @@ import {FC, useState} from "react";
 import {boxesStore} from "../../store/BoxesStore";
 
 export interface IModal {
+    show: boolean;
     closeCallback: () => void;
 }
 
-export const IncreaseCoastModal:FC<IModal> = ({ closeCallback})  => {
+export const IncreaseCoastModal:FC<IModal> = ({ show, closeCallback})  => {
     const [coefficient, setCoefficient] = useState<number>(1);
 
     const onCoefficientChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,7 +24,7 @@ export const IncreaseCoastModal:FC<IModal> = ({ closeCallback})  => {
 
 
     return (
-        <Modal show={true} onHide={closeCallback}>
+        <Modal show={show} onHide={closeCallback}>
             <Modal.Header closeButton>
                 <Modal.Title>Увеличить стоимость</Modal.Title>
             </Modal.Header>
