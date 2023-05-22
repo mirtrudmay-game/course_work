@@ -1,17 +1,21 @@
 import * as React from 'react';
-import {useEffect, useRef, useState} from 'react';
-import {Button, ButtonGroup, ButtonToolbar, Col, Container, Dropdown, Row} from "react-bootstrap";
+import {useEffect, useState} from 'react';
+import {Button, ButtonToolbar, Col, Container, Dropdown, Row} from "react-bootstrap";
 import {clientsTableColumns} from "../../data/data";
-import {clientsStore} from "../../store/ClientsStore";
 import Table from "../../components/Table/Table";
 import {observer} from "mobx-react-lite";
-import {createEditableRenterData, IRenter} from "../../types/types";
+import {IRenter} from "../../types/types";
 import ClientEditModal from "./ClientEditModal";
 import {Tooltip} from "../../components/Tooltip";
-import {boxesStore} from "../../store/BoxesStore";
+import {useStores} from "../../store/RootStore";
 
 const Clients = () => {
+    const { clientsStore } = useStores();
     const [showEditModal, setShowEditModal] = useState<boolean>(false);
+
+    useEffect(() => {
+        clientsStore.loadAll();
+    }, [])
 
     function closeEditModal() {
         setShowEditModal(false);
@@ -61,7 +65,7 @@ const Clients = () => {
 
             {clientsStore.selectedClient && showEditModal &&
                 <ClientEditModal show={showEditModal} closeCallback={closeEditModal}
-                                 initialData={createEditableRenterData(clientsStore.selectedClient)}/>}
+                                 initialData={clientsStore.selectedClient}/>}
         </>
     );
 };

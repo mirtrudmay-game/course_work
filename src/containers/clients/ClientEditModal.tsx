@@ -1,17 +1,14 @@
 import * as React from 'react';
-import {Button, ButtonToolbar, Form, InputGroup, Modal} from "react-bootstrap";
-import {FC, useEffect, useState} from "react";
-import {IEditRenter, IOption, IRenter} from "../../types/types";
+import {FC, useEffect, useState} from 'react';
+import {Button, ButtonToolbar, Form, Modal} from "react-bootstrap";
+import {IRenter} from "../../types/types";
 import {observer} from "mobx-react-lite";
 import InputMask from "react-input-mask";
 import {IModal} from "../boxes/IncreaseCostModal";
-import {modelsStore} from "../../store/ModelsStore";
-import {SingleValue} from "react-select";
-import {boxesStore} from "../../store/BoxesStore";
-import {clientsStore} from "../../store/ClientsStore";
 import "./styles.less";
 // @ts-ignore
 import clsx from 'clsx';
+import {useStores} from "../../store/RootStore";
 
 export interface IEditModal<T> extends IModal{
     initialData: T;
@@ -22,14 +19,25 @@ interface IEditClientErrors {
     phone: string;
 }
 
-const ClientEditModal: FC<IEditModal<IEditRenter>> = ({closeCallback, show, initialData}) => {
-    const [data, setData] = useState<IEditRenter>(initialData);
-    const [errors, setErrors] = useState<IEditClientErrors>({
-        fullName: '',
-        phone: '',
-    });
+const initialErrors: IEditClientErrors = {
+    fullName: '',
+    phone: '',
+}
 
-    function onHide() {
+const ClientEditModal: FC<IEditModal<IRenter>> = ({closeCallback, show, initialData}) => {
+    const { clientsStore} = useStores();
+
+    const [data, setData] = useState<IRenter>(initialData);
+    const [errors, setErrors] = useState<IEditClientErrors>(initialErrors);
+
+    useEffect(() => {
+        if (show) {
+            setErrors(initialErrors);
+        }
+
+    }, [show])
+
+    function onClose() {
         closeCallback();
     }
 
@@ -37,44 +45,39 @@ const ClientEditModal: FC<IEditModal<IEditRenter>> = ({closeCallback, show, init
         setData({...data, [name]: value});
     };
 
-    const onBlur = (name: string, value: string) => {
-        if (name === "phone") {
-            if (!value || value.includes("_")) setErrors({...errors, [name]: "Некорректное значение"})
-        }
+    const onBlurMaskedInput = (name: string, value: string) => {
+        if (!value || value.includes("_")) setErrors({...errors, [name]: "Некорректное значение"})
     }
 
-    const onFocus = (name: string, value: string) => {
+    const onFocusMaskedInput = (name: string, value: string) => {
         setErrors({...errors, [name]: ""})
     }
 
-    const onSubmitValidate = () => {
-        const _errors = Object.assign({}, errors);
-        if (!data.fullName) _errors.fullName = "Введите значение";
 
-        setErrors(_errors);
-    };
-
-    const isValid = () =>  {
-        return !Object.values(errors).filter((v) => v).length;
-    }
-
-    const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        onSubmitValidate();
-        isValid() && clientsStore.updateSelectedClient(data);
+        const _errors = Object.assign({}, errors);
+        if (!data.full_name) _errors.fullName = "Введите значение";
+
+        setErrors(_errors);
+
+        if (!Object.values(_errors).filter((v) => v).length) {
+            await clientsStore.updateSelectedClient(data);
+            onClose();
+        } else {
+            setErrors(_errors);
+        }
     }
 
-    const className = clsx(
+    const phoneClassName = clsx(
         'form-control',
         { 'phone-control': !errors.phone },
         { 'phone-control-danger': errors.phone }
     );
 
-
-
     return (
-        <Modal show={show} onHide={onHide}>
+        <Modal show={show} onHide={onClose}>
             <Modal.Header closeButton>
                 <Modal.Title>Редактирование данных о клиенте</Modal.Title>
             </Modal.Header>
@@ -85,7 +88,7 @@ const ClientEditModal: FC<IEditModal<IEditRenter>> = ({closeCallback, show, init
                         <Form.Control
                             name="fullName"
                             onChange={(e) => onChange(e.target.name, e.target.value)}
-                            value={data.fullName}
+                            value={data.full_name}
                             type="text"
                             autoComplete={"off"}
                         />
@@ -93,13 +96,13 @@ const ClientEditModal: FC<IEditModal<IEditRenter>> = ({closeCallback, show, init
 
                     <Form.Group className="mb-3">
                         <Form.Label className="required" >Телефон</Form.Label>
-                        <InputMask className={className}
+                        <InputMask className={phoneClassName}
                                    mask="+9(999) 999-9999"
                                    name={"phone"}
                                    value={data.phone}
                                    onChange={(e) => onChange(e.target.name, e.target.value)}
-                                   onBlur={(e) => onBlur(e.target.name, e.target.value)}
-                                   onFocus={(e) => onFocus(e.target.name, e.target.value)}
+                                   onBlur={(e) => onBlurMaskedInput(e.target.name, e.target.value)}
+                                   onFocus={(e) => onFocusMaskedInput(e.target.name, e.target.value)}
                                    required
                         />
                         {errors.phone && <div style={{color: "#dc3545", fontSize: ".875em", marginTop: "5px"}}>{errors.phone}</div>}
@@ -117,7 +120,7 @@ const ClientEditModal: FC<IEditModal<IEditRenter>> = ({closeCallback, show, init
 
                     <ButtonToolbar>
                         <Button className="me-3" type="submit">Отправить</Button>
-                        <Button onClick={onHide} variant="secondary">Отменить</Button>
+                        <Button onClick={onClose} variant="secondary">Отменить</Button>
                     </ButtonToolbar>
                 </Form>
             </Modal.Body>

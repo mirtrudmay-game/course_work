@@ -1,18 +1,23 @@
 import * as React from 'react';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Button, ButtonToolbar, Col, Container, Dropdown, Row} from "react-bootstrap";
 import Table from "../../components/Table/Table";
 import {boxTableColumns} from "../../data/data";
-import {boxesStore} from "../../store/BoxesStore"
 import BoxCreateModal from "./NewBoxModal";
 import {observer} from "mobx-react-lite";
-import {IBox} from "../../types/types";
+import {IBoxResponse} from "../../types/types";
 import ErrorModal from "../../components/modals/ErrorModal";
 import SuccessModal from "../../components/modals/SuccessModal";
 import {Tooltip} from "../../components/Tooltip";
 import {IncreaseCostModal} from "./IncreaseCostModal";
+import {useStores} from "../../store/RootStore";
 
 const Boxes = () => {
+    const { boxesStore } = useStores();
+    useEffect(() => {
+        boxesStore.loadAll();
+    }, [])
+
     const [showCreateBoxModal, setShowCreateBoxModal] = useState<boolean>(false);
     const [showIncreaseCostModal, setShowIncreaseCostModal] = useState<boolean>(false);
 
@@ -83,8 +88,8 @@ const Boxes = () => {
                 </Row>
                 <Row>
                     <Col>
-                        <Table<IBox> selectRowCallback={selectRowHandler} columns={boxTableColumns}
-                                     data={boxesStore.boxesList}/>
+                        <Table<IBoxResponse> selectRowCallback={selectRowHandler} columns={boxTableColumns}
+                                             data={boxesStore.boxesList}/>
                     </Col>
                 </Row>
             </Container>

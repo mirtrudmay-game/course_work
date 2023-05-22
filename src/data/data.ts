@@ -2,16 +2,16 @@ import {IModelResponse, IRenter} from "../types/types";
 
 export const clients: IRenter[] = [
     {
-        idRenter: 10,
-        fullName: "Петров Петр Петрович",
-        receiptNumber: 110,
+        id_renter: 10,
+        full_name: "Петров Петр Петрович",
+        receipt_number: 110,
         phone: "+7(910)277-33-73",
         address: "petrov@gmail.com"
     },
     {
-        idRenter: 11,
-        fullName: "Карпов Карп Поликарпович",
-        receiptNumber: 115,
+        id_renter: 11,
+        full_name: "Карпов Карп Поликарпович",
+        receipt_number: 115,
         phone: "+7(905)111-19-73",
         address: "karp@gmail.com"
     }
@@ -56,7 +56,7 @@ export const boxTableColumns = [
 export const clientsTableColumns = [
     {
         Header: 'ФИО',
-        accessor: 'idRenter',
+        accessor: 'full_name',
     },
     {
         Header: 'Телефон',
@@ -68,6 +68,6 @@ export const clientsTableColumns = [
     },
     {
         Header: 'Квитанция',
-        accessor: 'receiptNumber',
+        accessor: 'receipt_number',
     },
 ]

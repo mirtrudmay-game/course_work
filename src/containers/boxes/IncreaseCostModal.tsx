@@ -1,7 +1,7 @@
-import {Button, Form, InputGroup, Modal} from "react-bootstrap";
+import {Button, Form, Modal} from "react-bootstrap";
 import * as React from "react";
 import {FC, useState} from "react";
-import {boxesStore} from "../../store/BoxesStore";
+import {useStores} from "../../store/RootStore";
 
 export interface IModal {
     show: boolean;
@@ -9,6 +9,8 @@ export interface IModal {
 }
 
 export const IncreaseCostModal:FC<IModal> = ({ show, closeCallback})  => {
+    const { boxesStore, modelsStore } = useStores();
+
     const [coefficient, setCoefficient] = useState<number>(1);
 
     const onCoefficientChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -18,7 +20,7 @@ export const IncreaseCostModal:FC<IModal> = ({ show, closeCallback})  => {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        await boxesStore.increasecost(coefficient);
+        await boxesStore.increaseCost(coefficient);
         closeCallback();
     };
 

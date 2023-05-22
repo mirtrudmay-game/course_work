@@ -1,19 +1,20 @@
-import { makeAutoObservable, runInAction } from "mobx";
+import {makeAutoObservable, runInAction} from "mobx";
 import axios from "axios";
-import { IModelResponse, IBox} from "../types/types";
-import {models}  from "../data/data";
-import {Mode} from "fs";
+import {IModelResponse} from "../types/types";
+import {RootStore} from "./RootStore";
 
 interface IModelsStore {
     modelsList: IModelResponse[];
 }
 
-class ModelsStore implements IModelsStore {
+export class ModelsStore implements IModelsStore {
     modelsList: IModelResponse[] = [];
 
-    constructor() {
+    private rootStore: RootStore;
+
+    constructor(rootStore: RootStore) {
+        this.rootStore = rootStore;
         makeAutoObservable(this);
-        this.loadAll();
     }
 
     async loadAll(): Promise<void> {
@@ -27,8 +28,6 @@ class ModelsStore implements IModelsStore {
         } catch (e) {
 
         }
-
-        this.modelsList = models;
     }
 
     async createModel(value: string) {
@@ -40,5 +39,3 @@ class ModelsStore implements IModelsStore {
         return this.modelsList.find((model) => model.id_model === +id) || null;
     }
 }
-
-export const modelsStore = new ModelsStore();

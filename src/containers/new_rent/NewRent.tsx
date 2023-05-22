@@ -1,218 +1,266 @@
 import * as React from "react";
-import {useState} from "react";
-import {IBox, CarInput, getOption, getOptions, IOption, IRenter} from "../../types/types";
-import {Button, Container, Form, Modal} from "react-bootstrap";
-import Table from "../../components/Table/Table";
-import {boxTableColumns} from "../../data/data";
-import {boxesStore} from "../../store/BoxesStore";
-import Select, {OnChangeValue} from "react-select";
-import {clientsStore} from "../../store/ClientsStore";
-import {modelsStore} from "../../store/ModelsStore";
+import {useEffect, useState} from "react";
+import {IOption} from "../../types/types";
+import {Button, Container, Form, FormGroup, FormLabel} from "react-bootstrap";
+import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
 import InputMask from "react-input-mask";
+import {useStores} from "../../store/RootStore";
+import {SelectBoxModal} from "./SelectBoxModal";
+import clsx from "clsx";
 
-const initialRenterData: IRenter = {
-    idRenter: null,
-    fullName: '',
-    address: '',
-    phone: '',
-    receiptNumber: null
-}
-const initialCarData: CarInput = {
-    carNumber: null,
-    renter: initialRenterData,
-    box: null,
-    model: null,
-    rentalStartDate: new Date()
+interface ICarCreateData {
+    carNumber: string;
+    renterName: IOption;
+    renterPhone: string;
+    renterAddress: string;
+    renterReceiptNumber: string;
+    model: IOption;
+    rentalStartDate: string;
 }
 
-function SelectBoxModal() {
-    const [selectedRow, setSelectedBox] = useState<IBox>();
+interface ICarCreateError {
+    carNumber: string;
+    renterName: string
+    renterPhone: string;
+    renterReceiptNumber: string;
+    model: string;
+    rentalStartDate: string;
+}
 
-    function selectRowHandler(value: IBox) {
-        setSelectedBox(value);
-    }
+const initialCarData: ICarCreateData = {
+    carNumber: '',
+    renterName: new IOption("", ""),
+    renterPhone: '',
+    renterAddress: '',
+    renterReceiptNumber: '',
+    model: new IOption('', ''),
+    rentalStartDate: '',
+}
 
-    function createRent() {
-
-    }
-
-    return (
-        <Modal size={"xl"} show={true}>
-            <Modal.Header closeButton>Выбор бокса</Modal.Header>
-            <Modal.Body>
-                <Table<IBox> columns={boxTableColumns} data={boxesStore.freeBoxesByCurrentModel}
-                             selectRowCallback={selectRowHandler} onlyOneValue={true}/>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button onClick={createRent}></Button>
-            </Modal.Footer>
-
-        </Modal>
-    )
+const initialCarErrors: ICarCreateError  = {
+    carNumber: '',
+    renterName: '',
+    renterPhone: '',
+    renterReceiptNumber: '',
+    model: '',
+    rentalStartDate: '',
 }
 
 export const NewRent = () => {
-    const [car, setCar] = useState<CarInput>(initialCarData);
+    const { modelsStore, clientsStore} = useStores();
+
+    const [models, setModels] = useState<IOption[]>([]);
+    const [renters, setRenters] = useState<IOption[]>([]);
+
+    const [data, setData] = useState<ICarCreateData>(initialCarData);
+    const [errors, setErrors] = useState<ICarCreateError>(initialCarErrors);
+
     const [isClientEditable, setClientEditable] = useState<boolean>(false);
-    const [showFreeBoxes, setShowFreeBoxes] = useState(false);
+    const [showFreeBoxesModal, setShowFreeBoxesModal] = useState<boolean>(false);
 
-    const [renterValidated, setRenterValidated] = useState(true);
-    const [phoneValidate, setPhoneValidate] = useState(true);
-    const [modelValidated, setModelValidated] = useState(true);
-    const [carNumberValidate, setCarNumberValidate] = useState(true);
-
-
-    async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (!car.renter.fullName) setRenterValidated(false);
-
-        if (!car.model) setModelValidated(false);
-        if (!car.carNumber) setCarNumberValidate(false);
-
-
-        if (car.model) {
-            await boxesStore.loadFreeByModelId(car.model.id);
-            setShowFreeBoxes(true);
-        }
-
-    }
-
-    function createRenterHandler(inputValue: string) {
-        const renter: IRenter = {...initialRenterData, fullName: inputValue}
-        setCar({...car, renter: renter});
-        setClientEditable(true);
-    }
-
-    function selectRenterHandler(newValue: OnChangeValue<IOption, false>) {
-        const renterData = clientsStore.getById(newValue?.value);
-        setCar({...car, renter: renterData || initialRenterData});
-        setClientEditable(false);
-    }
-
-    function selectModelHandler(newValue: OnChangeValue<IOption, false> | null) {
-        const model = modelsStore.getById(newValue?.value);
-        setCar({...car, model: model});
-    }
-
-    function renterPropertyChangeHandler(event: React.ChangeEvent<HTMLInputElement>) {
-        const {name, value} = event.target;
-        const renter = {...car.renter, [name]: value}
-        setCar({...car, renter})
-    }
-
-    function carPropertyChangeHandler(event: React.ChangeEvent<HTMLInputElement>) {
-        const {name, value} = event.target;
-        setCar({...car, [name]: value})
-    }
-
-    const renterCustomStyles = {
-        control: (base, state) => ({
-            ...base,
-            borderColor: renterValidated ? '#ddd' : 'red',
-            '&:hover': {
-                borderColor: state.isFocused ? '#ddd'
-                    : renterValidated ? '#ddd' : 'red'
-            }
+    useEffect(() => {
+        modelsStore.loadAll().then(() => {
+            const modelsList = modelsStore.modelsList.map((model) => new IOption(model.id_model.toString(), model.name));
+            setModels(modelsList);
         })
+
+        clientsStore.loadAll().then(() => {
+            const clientsList = clientsStore.clientsList.map((client) => new IOption(client.id_renter.toString(), client.full_name));
+            setRenters(clientsList);
+            console.log(clientsList)
+        });
+
+    }, [])
+
+
+    const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        /*const _errors = Object.assign({}, errors);
+        if (!data.renterName) _errors.renterName = "Введите значение";
+        if (!data.renterPhone) _errors.renterPhone = "Введите значение";
+        // if (!data.renterReceiptNumber) _errors.renterReceiptNumber = "Введите значение";
+        if (!data.model) _errors.model =
+
+        setErrors(_errors);*/
+
+        const _errors = Object.assign({}, errors);
+        Object.keys(errors).forEach((key) => {
+            // @ts-ignore
+            if (!data[key]) _errors[key] = "Введите значение";
+        });
+
+        if (!Object.values(_errors).filter((v) => v).length) {
+            setShowFreeBoxesModal(true);
+        } else {
+            setErrors(_errors);
+        }
     }
 
     const modelCustomStyles = {
+        // @ts-ignore
         control: (base, state) => ({
             ...base,
-            borderColor: modelValidated ? '#ddd' : 'red',
+            borderColor: errors.model ? '#dc3545' : '#ddd',
             '&:hover': {
                 borderColor: state.isFocused ? '#ddd'
-                    : modelValidated ? '#ddd' : 'red'
+                    : errors.model ? '#dc3545' : '#ddd'
             }
         })
     }
 
-    function renterFocusHandler() {
-        setRenterValidated(true);
+    const renterCustomStyles = {
+        // @ts-ignore
+        control: (base, state) => ({
+            ...base,
+            borderColor: errors.renterName ? '#dc3545' : '#ddd',
+            '&:hover': {
+                borderColor: state.isFocused ? '#ddd'
+                    : errors.model ? '#dc3545' : '#ddd'
+            }
+        })
     }
 
-    function renterBlurHandler() {
-        if (!car.renter.fullName) setRenterValidated(false);
+    const onSelectRenter = (value: string | IOption | null) => {
+        if (!value) {
+            setData({
+                ...data, renterName: new IOption('', ''), renterPhone: '', renterAddress: '', renterReceiptNumber: ''
+            })
+            setClientEditable(false);
+            return;
+        }
+
+        setErrors({...errors, model: ''});
+
+        if (typeof value === "string") {
+            setData({
+                ...data, renterName: new IOption('', value), renterPhone: '', renterAddress: '', renterReceiptNumber: ''
+            })
+            setClientEditable(true);
+            return;
+        }
+
+        const renter = clientsStore.getById(value.value);
+        setData({
+            ...data, renterName: value, renterPhone: renter.phone, renterAddress: renter.address, renterReceiptNumber: renter.receipt_number.toString()
+        });
+        setClientEditable(false);
     }
 
-    function modelFocusHandler() {
-        setModelValidated(true);
+    const onChangeSelect = (name: string, value: string | IOption | null) => {
+        if (!value) {
+            setData({
+                ...data, [name]: {
+                    value: '',
+                    label: ''
+                }
+            })
+            return;
+        }
+
+        setErrors({...errors, model: ''});
+
+        if (typeof value === "string") {
+            setData({
+                ...data, [name]: {
+                    value: '',
+                    label: value
+                }
+            })
+            return;
+        }
+
+        setData({
+            ...data, [name]: value
+        });
     }
 
-    function modelBlurHandler() {
-        debugger
-        if (!car.model) setModelValidated(false);
+    const onChange = (name: string, value: string) => {
+        setData({...data, [name]: value});
+    };
+
+    const onBlurMaskedInput = (name: string, value: string) => {
+        if (!value || value.includes("_")) setErrors({...errors, [name]: "Некорректное значение"})
     }
+
+    const onFocusMaskedInput = (name: string, value: string) => {
+        setErrors({...errors, [name]: ""})
+    }
+
+    const phoneClassName = clsx(
+        'form-control',
+        { 'phone-control': !errors.renterPhone },
+        { 'phone-control-danger': errors.renterPhone }
+    );
+
+    const onCloseFreeBoxesModal = () => {
+        setShowFreeBoxesModal(false);
+    };
 
     return (
         <Container>
-            <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3">
-                    <Form.Label>Клиент</Form.Label>
+            <Form onSubmit={onSubmit}>
+                <FormGroup className="mb-3">
+                    <FormLabel className="required-p">Клиент</FormLabel>
                     <CreatableSelect
                         styles={renterCustomStyles}
                         isClearable
-                        name="renter"
-                        value={getOption(car.renter, "idRenter", "fullName")}
-                        placeholder={"ФИО клиента"}
-                        onChange={selectRenterHandler}
-                        onCreateOption={createRenterHandler}
-                        options={getOptions(clientsStore.clientsList, "idRenter", "fullName")}
-                        onFocus={renterFocusHandler}
-                        onBlur={renterBlurHandler}
+                        onChange={(newValue) => onSelectRenter(newValue)}
+                        onCreateOption={(newValue) => onSelectRenter(newValue)}
+                        value={data.renterName}
+                        options={renters}
                     />
-                    {!renterValidated && <div style={{color: "red"}}>Введите имя клиента</div>}
-                </Form.Group>
-
+                    {errors?.renterName &&
+                        <div style={{color: "#dc3545", fontSize: ".875em", marginTop: "5px"}}>{errors.renterName}</div>}
+                </FormGroup>
 
                 <Form.Group className="mb-3">
-                    <Form.Label>Телефон</Form.Label>
-                    <InputMask className="form-control"
-                               mask="+7(999) 999-9999"
-                               name={"phone"}
+                    <Form.Label className="required-p" >Телефон</Form.Label>
+                    <InputMask className={phoneClassName}
+                               mask="+9(999) 999-9999"
+                               name={"renterPhone"}
+                               value={data.renterPhone}
+                               onChange={(e) => onChange(e.target.name, e.target.value)}
+                               onBlur={(e) => onBlurMaskedInput(e.target.name, e.target.value)}
+                               onFocus={(e) => onFocusMaskedInput(e.target.name, e.target.value)}
+                               required
                                readOnly={!isClientEditable}
-                               value={car.renter.phone || ""}
-                               onChange={renterPropertyChangeHandler}
                     />
-                    {!phoneValidate && <div style={{color: "red"}}>Введите номер телефона</div>}
+                    {errors.renterPhone && <div style={{color: "#dc3545", fontSize: ".875em", marginTop: "5px"}}>{errors.renterPhone}</div>}
                 </Form.Group>
 
                 <Form.Group className="mb-3">
                     <Form.Label>Адрес</Form.Label>
                     <Form.Control
-                        name="address"
-                        readOnly={!isClientEditable}
-                        onChange={renterPropertyChangeHandler}
-                        value={car.renter?.address || ""}
+                        name="renterAddress"
+                        onChange={(e) => onChange(e.target.name, e.target.value)}
+                        value={data.renterAddress}
                         type="text"
+                        readOnly={!isClientEditable}
                     />
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                    <Form.Label>Модель</Form.Label>
+                    <Form.Label className="required-p">Модель</Form.Label>
                     <Select
                         styles={modelCustomStyles}
-                        name="renter"
-                        value={getOption(car.model, "id", "name")}
+                        name="model"
+                        value={data.model}
                         placeholder={"Название модели"}
-                        onChange={selectModelHandler}
-                        options={getOptions(modelsStore.modelsList, "id", "name")}
-                        onFocus={modelFocusHandler}
-                        onBlur={modelBlurHandler}
+                        onChange={(newValue) => onChangeSelect("model", newValue)}
+                        options={models}
                     />
-                    {!modelValidated && <div style={{color: "red"}}>Введите название модели</div>}
+                    {errors.model && <div style={{color: "#dc3545", fontSize: ".875em", marginTop: "5px"}}>{errors.model}</div>}
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                    <Form.Label>Номер машины</Form.Label>
+                    <Form.Label className="required-p">Номер машины</Form.Label>
                     <Form.Control
                         name="carNumber"
-                        value={car.carNumber || ""}
+                        value={data.carNumber}
                         type="text"
-                        onChange={carPropertyChangeHandler}
+                        onChange={(e) => onChange(e.target.name, e.target.value)}
                     />
                     <Form.Control.Feedback type="invalid">Введите номер машины</Form.Control.Feedback>
                 </Form.Group>
@@ -222,7 +270,7 @@ export const NewRent = () => {
                 </Button>
             </Form>
 
-            {showFreeBoxes && <SelectBoxModal/>}
+            {<SelectBoxModal show={showFreeBoxesModal} id={data.model.value} closeCallback={onCloseFreeBoxesModal}/>}
         </Container>
     );
 }

@@ -8,35 +8,26 @@ export interface IModelResponse {
 }
 
 export interface IModelCreate {
-    id_model: number | null;
     name: string
 }
-
-
 
 /**
  * Бокс.
  */
 
-/*export interface IBox {
-    box_number: number;
-    model: IModel;
-    daily_cost: number;
-}*/
-
-export interface IBox {
+export interface IBoxResponse {
     box_number: number;
     id_model: number;
     model_name: string;
     daily_cost: number;
 }
 
-
-/*export interface ICreateBox {
-    box_number: string;
-    model: IOption;
-    daily_cost: string;
-}*/
+export interface IBoxCreate {
+    box_number: number;
+    id_model: number | null;
+    model_name: string;
+    daily_cost: number;
+}
 
 
 /**
@@ -44,27 +35,39 @@ export interface IBox {
  */
 
 export interface IRenter {
-    idRenter: number;
-    fullName: string;
+    id_renter: number;
+    full_name: string;
     phone: string;
     address: string;
-    receiptNumber: number;
+    receipt_number: number;
 }
 
-export interface IEditRenter {
-    fullName: string;
+export interface IRenterCreate {
+    full_name: string;
     phone: string;
     address: string;
+    receipt_number: number;
 }
 
-export const createEditableRenterData = (renter: IRenter): IEditRenter => {
-    return {
-        fullName: renter.fullName,
-        phone: renter.phone,
-        address: renter.address,
-    }
+/**
+ * Машина (бронирование).
+ */
+
+export interface ICarResponse {
+    car_number: number;
+    box_number: number;
+    renter_name: string;
+    model_name: string;
+    rental_start_date: string;
 }
 
+export interface ICarCreate {
+    car_number: number;
+    box_number: number;
+    id_renter: number;
+    id_model: number;
+    rental_start_date: string;
+}
 
 /*export interface Car {
     carNumber: number;
@@ -82,9 +85,14 @@ export interface CarInput {
     rentalStartDate: Date;
 }*/
 
-export interface IOption {
+export class IOption {
     value: string;
     label: string;
+
+    constructor(value: string, label: string) {
+        this.value = value;
+        this.label = label;
+    }
 }
 
 export function getOptions<Obj, Key extends keyof Obj>(arr: Obj[], keyValue: Key, keyLabel: Key) {
@@ -96,3 +104,4 @@ export function getOption<Obj, Key extends keyof Obj>(obj: Obj | null, keyValue:
 
     return {value: obj[keyValue], label: obj[keyLabel]} as IOption;
 }
+

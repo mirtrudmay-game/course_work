@@ -1,38 +1,45 @@
-import {computed, makeAutoObservable, observable, runInAction} from "mobx";
-import {IEditRenter, IRenter} from "../types/types";
-import {clients}  from "../data/data";
+import {makeAutoObservable, runInAction} from "mobx";
+import {IRenter} from "../types/types";
+import {RootStore} from "./RootStore";
+import axios from "axios";
 
 interface IClientsStore {
     clientsList: IRenter[];
     selectedClient: IRenter | null;
+    errorMessage: string;
+    successMessage: string;
 }
 
-class ClientsStore implements IClientsStore {
+export class ClientsStore implements IClientsStore {
+    errorMessage: string = "";
+    successMessage: string = "";
     clientsList: IRenter[] = [];
     selectedClient: IRenter | null = null;
 
-    constructor() {
+    private rootStore: RootStore;
+
+    constructor(rootStore: RootStore) {
+        this.rootStore = rootStore;
+
         makeAutoObservable(this);
-        this.loadAll();
     }
 
     async loadAll(): Promise<void> {
-        this.clientsList = clients;
-/*        try {
-            const response = await axios.get("/data-service/renters/all");
+        try {
+            const response = await axios.get<IRenter[]>("/data-service/renters/all");
 
             runInAction(() => {
                 this.clientsList = response.data;
             })
 
         } catch (e) {
-        }*/
+            this.errorMessage = "Ошибка загрузки списка клиентов.";
+        }
 
     }
 
-    getById(id: string | undefined): IRenter | null {
-        if (!id) return null;
-        return this.clientsList.find((client) => client.idRenter === +id) || null;
+    getById(id: string): IRenter {
+        return this.clientsList.find((client) => client.id_renter === +id)!;
     }
 
     setSelectedClient(indexes: Record<string, boolean>) {
@@ -48,9 +55,15 @@ class ClientsStore implements IClientsStore {
 
     }
 
-    updateSelectedClient(data: IEditRenter) {
-        return false;
+    async updateSelectedClient(data: IRenter) {
+        try {
+            const response = await axios.post("/data-service/renters/add", data);
+
+            await this.loadAll();
+            this.successMessage = "Данные успешно обновлены.";
+        } catch (error) {
+            this.errorMessage = "Ошибка обновления данных о пользователе.";
+        }
     }
 }
 
-export const clientsStore = new ClientsStore();
