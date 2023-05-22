@@ -1,18 +1,19 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import axios from "axios";
-import { IModel, ITableViewBox} from "../types/types";
-import {boxes, models}  from "../data/data";
+import { IModelResponse, IBox} from "../types/types";
+import {models}  from "../data/data";
 import {Mode} from "fs";
 
 interface IModelsStore {
-    modelsList: IModel[];
+    modelsList: IModelResponse[];
 }
 
 class ModelsStore implements IModelsStore {
-    modelsList: IModel[] = [];
+    modelsList: IModelResponse[] = [];
 
     constructor() {
         makeAutoObservable(this);
+        this.loadAll();
     }
 
     async loadAll(): Promise<void> {
@@ -34,9 +35,9 @@ class ModelsStore implements IModelsStore {
 
     }
 
-    getById(id: string | undefined): IModel | null {
+    getById(id: string | undefined): IModelResponse | null {
         if (!id) return null;
-        return this.modelsList.find((model) => model.id === +id) || null;
+        return this.modelsList.find((model) => model.id_model === +id) || null;
     }
 }
 

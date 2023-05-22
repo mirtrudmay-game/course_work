@@ -5,7 +5,5 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./main.less";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-    <React.StrictMode>
-        <App />
-    </React.StrictMode>,
+    <App />,
 );

@@ -2,42 +2,41 @@
  * Модель.
  */
 
-export interface IModel {
-    id: number;
+export interface IModelResponse {
+    id_model: number;
     name: string
 }
+
+export interface IModelCreate {
+    id_model: number | null;
+    name: string
+}
+
 
 
 /**
  * Бокс.
  */
 
-export interface IBox {
-    boxNumber: number;
+/*export interface IBox {
+    box_number: number;
     model: IModel;
-    dailyCoast: number;
-}
+    daily_cost: number;
+}*/
 
-export interface ITableViewBox {
-    boxNumber: number;
-    modelName: string;
-    dailyCoast: number;
-}
-
-export const createTableViewBoxData = (box: IBox): ITableViewBox => {
-    return {
-        modelName: box.model.name,
-        boxNumber: box.boxNumber,
-        dailyCoast: box.dailyCoast
-    }
+export interface IBox {
+    box_number: number;
+    id_model: number;
+    model_name: string;
+    daily_cost: number;
 }
 
 
-export interface ICreateBox {
-    boxNumber: string;
+/*export interface ICreateBox {
+    box_number: string;
     model: IOption;
-    dailyCoast: string;
-}
+    daily_cost: string;
+}*/
 
 
 /**

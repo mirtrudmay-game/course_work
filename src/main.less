@@ -22,8 +22,27 @@
 }
 
 .dropdown-toggle::after {
-  //display: none !important;
   margin-left: 10px !important;
+}
+
+.dropdown-menu.show {
+  width: 450px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.dropdown-item {
+  height: 40px;
+
+  &:hover {
+    background-color: white;
+    text-decoration: underline;
+  }
+
+  &:active {
+    background-color: white;
+    color: black;
+  }
 }
 
 .big-icon::before {

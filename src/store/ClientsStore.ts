@@ -1,5 +1,4 @@
 import {computed, makeAutoObservable, observable, runInAction} from "mobx";
-import axios from "axios";
 import {IEditRenter, IRenter} from "../types/types";
 import {clients}  from "../data/data";
 
@@ -14,6 +13,7 @@ class ClientsStore implements IClientsStore {
 
     constructor() {
         makeAutoObservable(this);
+        this.loadAll();
     }
 
     async loadAll(): Promise<void> {

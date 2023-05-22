@@ -1,4 +1,4 @@
-import {IModel, IRenter, IBox} from "../types/types";
+import {IModelResponse, IRenter} from "../types/types";
 
 export const clients: IRenter[] = [
     {
@@ -18,40 +18,22 @@ export const clients: IRenter[] = [
 ];
 
 
-export const models: IModel[] = [
+export const models: IModelResponse[] = [
     {
         name: "Ford",
-        id: 100
+        id_model: 100
     },
     {
         name: "Opel",
-        id: 101
+        id_model: 101
     },
     {
         name: "Lada",
-        id: 102
+        id_model: 102
     },
     {
         name: "Kia",
-        id: 103
-    }
-]
-
-export const boxes: IBox[] = [
-    {
-        boxNumber: 90,
-        model: models[0],
-        dailyCoast: 1200,
-    },
-    {
-        boxNumber: 105,
-        model: models[0],
-        dailyCoast: 1000,
-    },
-    {
-        boxNumber: 106,
-        model: models[0],
-        dailyCoast: 800,
+        id_model: 103
     }
 ]
 
@@ -59,15 +41,15 @@ export const boxes: IBox[] = [
 export const boxTableColumns = [
         {
             Header: 'Номер бокса',
-            accessor: 'boxNumber',
+            accessor: 'box_number',
         },
         {
             Header: 'Поддерживаемая марка',
-            accessor: 'modelName',
+            accessor: 'model_name',
         },
         {
             Header: 'Стоимость (руб / сутки)',
-            accessor: 'dailyCoast',
+            accessor: 'daily_cost',
         },
     ]
 

@@ -8,7 +8,7 @@ export interface IModal {
     closeCallback: () => void;
 }
 
-export const IncreaseCoastModal:FC<IModal> = ({ show, closeCallback})  => {
+export const IncreaseCostModal:FC<IModal> = ({ show, closeCallback})  => {
     const [coefficient, setCoefficient] = useState<number>(1);
 
     const onCoefficientChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -18,7 +18,7 @@ export const IncreaseCoastModal:FC<IModal> = ({ show, closeCallback})  => {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        await boxesStore.increaseCoast(coefficient);
+        await boxesStore.increasecost(coefficient);
         closeCallback();
     };
 

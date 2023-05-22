@@ -8,8 +8,8 @@ export default ({ mode }) => {
         plugins: [react()],
         server: {
             proxy: {
-                "/data-service/api": {
-                    target: "http://localhost:8080",
+                "/data-service": {
+                    target: "http://localhost:8081",
                     rewrite: (path) => path.replace("/data-service", ""),
                 },
             },

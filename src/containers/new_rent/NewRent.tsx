@@ -1,6 +1,6 @@
 import * as React from "react";
 import {useState} from "react";
-import {ITableViewBox, CarInput, getOption, getOptions, IOption, IRenter} from "../../types/types";
+import {IBox, CarInput, getOption, getOptions, IOption, IRenter} from "../../types/types";
 import {Button, Container, Form, Modal} from "react-bootstrap";
 import Table from "../../components/Table/Table";
 import {boxTableColumns} from "../../data/data";
@@ -27,9 +27,9 @@ const initialCarData: CarInput = {
 }
 
 function SelectBoxModal() {
-    const [selectedRow, setSelectedBox] = useState<ITableViewBox>();
+    const [selectedRow, setSelectedBox] = useState<IBox>();
 
-    function selectRowHandler(value: ITableViewBox) {
+    function selectRowHandler(value: IBox) {
         setSelectedBox(value);
     }
 
@@ -41,8 +41,8 @@ function SelectBoxModal() {
         <Modal size={"xl"} show={true}>
             <Modal.Header closeButton>Выбор бокса</Modal.Header>
             <Modal.Body>
-                <Table<ITableViewBox> columns={boxTableColumns} data={boxesStore.freeBoxesByCurrentModel}
-                                      selectRowCallback={selectRowHandler} onlyOneValue={true}/>
+                <Table<IBox> columns={boxTableColumns} data={boxesStore.freeBoxesByCurrentModel}
+                             selectRowCallback={selectRowHandler} onlyOneValue={true}/>
             </Modal.Body>
             <Modal.Footer>
                 <Button onClick={createRent}></Button>

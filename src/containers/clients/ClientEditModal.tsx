@@ -4,7 +4,7 @@ import {FC, useEffect, useState} from "react";
 import {IEditRenter, IOption, IRenter} from "../../types/types";
 import {observer} from "mobx-react-lite";
 import InputMask from "react-input-mask";
-import {IModal} from "../boxes/IncreaseCoastModal";
+import {IModal} from "../boxes/IncreaseCostModal";
 import {modelsStore} from "../../store/ModelsStore";
 import {SingleValue} from "react-select";
 import {boxesStore} from "../../store/BoxesStore";

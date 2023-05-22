@@ -10,11 +10,11 @@ import {boxesStore} from "../store/BoxesStore";
 import {NewRent} from "../containers/new_rent/NewRent";
 
 const App = () => {
-    useEffect(() => {
+/*    useEffect(() => {
         clientsStore.loadAll();
         modelsStore.loadAll();
         boxesStore.loadAll();
-    }, [])
+    }, [])*/
 
     return (
         <React.StrictMode>

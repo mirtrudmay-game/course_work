@@ -1,89 +1,108 @@
 import * as React from 'react';
 import {FC, useEffect, useState} from 'react';
 import {Button, Form, FormControl, FormGroup, FormLabel, FormSelect, Modal} from "react-bootstrap";
-import {ICreateBox, IOption} from "../../types/types";
-import {modelsStore} from "../../store/ModelsStore";
+import {IOption} from "../../types/types";
 import CreatableSelect from "react-select/creatable";
 import {observer} from "mobx-react-lite";
 import {SingleValue} from "react-select";
-import {IModal} from "./IncreaseCoastModal";
+import {IModal} from "./IncreaseCostModal";
 import {boxesStore} from "../../store/BoxesStore";
+import {modelsStore} from "../../store/ModelsStore";
 
-
-interface ICreateBoxError {
-    boxNumber: string;
+interface IBoxCreateError {
+    box_number: string;
     model: string;
-    dailyCoast: string;
+    daily_cost: string;
+}
+
+export interface IBoxCreateData {
+    box_number: string;
+    model: string | IOption | null;
+    daily_cost: string;
+}
+const initialData: IBoxCreateData = {
+    box_number: '',
+    model: {
+        value: '',
+        label: ''
+    },
+    daily_cost: ''
+}
+
+const initialErrors: IBoxCreateError = {
+    box_number: '',
+    model: '',
+    daily_cost: ''
 }
 
 const CreateBoxModal: FC<IModal> = ({show, closeCallback}) => {
-    const initialData: ICreateBox = {
-        boxNumber: '',
-        model: {
-            value: '',
-            label: ''
-        },
-        dailyCoast: ''
-    }
-
-    const initialErrors: ICreateBoxError = {
-        boxNumber: '',
-        model: '',
-        dailyCoast: ''
-    }
-
     const [models, setModels] = useState<IOption[]>();
-    const [data, setData] = useState<ICreateBox>(initialData);
-    const [errors, setErrors] = useState<ICreateBoxError>(initialErrors);
+    const [data, setData] = useState<IBoxCreateData>(initialData);
+    const [errors, setErrors] = useState<IBoxCreateError>(initialErrors);
 
     useEffect(() => {
-        modelsStore.loadAll().then(() => {
+        if (show) {
             const options: IOption[] =
                 modelsStore.modelsList.map((model): IOption => ({
-                    value: model.id.toString(),
+                    value: model.id_model.toString(),
                     label: model.name
                 }));
 
             setModels(options);
-        });
-
-    }, []);
+        }
+    }, [show, modelsStore.modelsList]);
 
     const onChangeValidate = (name: string, value: string | SingleValue<IOption>) => {
-        if (["boxNumber", "dailyCoast"].includes(name)) {
-            if (value && isNaN(+value)) return "Некорректное значение";
+        if (["box_number", "daily_cost"].includes(name)) {
+            setErrors({...errors, [name]: isNaN(+value!) ? "Некорректное значение" : ""});
         }
         return '';
     }
 
     const onChange = (name: string, value: string | SingleValue<IOption>) => {
-        const err = onChangeValidate(name, value);
-        setErrors({...errors, [name]: err});
+        if (["daily_cost", "box_number"].includes(name)) {
 
-        if (name === "model" && typeof value === "string") {
-            setData({
-                ...data, model: {
-                    value: '',
-                    label: value
-                }
-            });
+        }
+        // Для модели валидация не нужна.
+        if (name === "model") {
+            if (typeof value === "string") {
+                setData({
+                    ...data, model: {
+                        value: '',
+                        label: value
+                    }
+                });
+                return;
+            }
+
+            setData({...data, model: value});
+            setErrors({...errors, model: ""});
             return;
         }
 
+        // Остальные поля - числовые.
         setData({...data, [name]: value});
+
+        if ()  {
+
+        } else {
+            setErrors({...errors, [name]: ""});
+        }
     };
 
-    const onClose = () => {
+    const close = () => {
         setData(initialData);
         setErrors(initialErrors);
+
         closeCallback();
     }
 
     const isValid = () =>  {
+        debugger
         const _errors = Object.assign({}, errors);
-        if (!data.boxNumber) _errors.boxNumber = "Введите значение";
+        if (!data.box_number) _errors.box_number = "Введите значение";
         if (!data.model.label) _errors.model = "Введите значение";
-        if (!data.dailyCoast) _errors.dailyCoast = "Введите значение";
+        if (!data.daily_cost) _errors.daily_cost = "Введите значение";
 
         setErrors(_errors);
         return !Object.values(_errors).filter((v) => v).length;
@@ -94,7 +113,7 @@ const CreateBoxModal: FC<IModal> = ({show, closeCallback}) => {
 
         if (isValid()) {
             await boxesStore.saveNewBox(data)
-            onClose();
+            close();
         }
     }
 
@@ -122,14 +141,14 @@ const CreateBoxModal: FC<IModal> = ({show, closeCallback}) => {
                     <FormGroup className="mb-3">
                         <FormLabel className="required">Номер бокса</FormLabel>
                         <FormControl
-                            name="boxNumber"
-                            value={data.boxNumber}
+                            name="box_number"
+                            value={data.box_number}
                             onChange={(e) => onChange(e.target.name, e.target.value)}
-                            isInvalid={!!errors.boxNumber}
+                            isInvalid={!!errors.box_number}
                             type="text"
                             autoComplete={"off"}
                         />
-                        <FormControl.Feedback type="invalid">{errors.boxNumber}</FormControl.Feedback>
+                        <FormControl.Feedback type="invalid">{errors.box_number}</FormControl.Feedback>
                     </FormGroup>
 
                     <FormGroup className="mb-3">
@@ -148,16 +167,16 @@ const CreateBoxModal: FC<IModal> = ({show, closeCallback}) => {
                     <FormGroup className="mb-3">
                         <FormLabel className="required">Стоимость (руб/сутки) </FormLabel>
                         <FormControl
-                            name={"dailyCoast"}
-                            value={data.dailyCoast}
+                            name={"daily_cost"}
+                            value={data.daily_cost}
                             onChange={(e) => onChange(e.target.name, e.target.value)}
-                            isInvalid={!!errors.dailyCoast}
+                            isInvalid={!!errors.daily_cost}
                             type="text"
                             autoComplete={"off"}/>
-                        <FormControl.Feedback type="invalid">{errors.dailyCoast}</FormControl.Feedback>
+                        <FormControl.Feedback type="invalid">{errors.daily_cost}</FormControl.Feedback>
                     </FormGroup>
                     <Button type="submit" className={"me-2"}>Отправить</Button>
-                    <Button type="reset" variant={"secondary"} onClick={onClose}>Отмена</Button>
+                    <Button type="reset" variant={"secondary"} onClick={close}>Отмена</Button>
                 </Form>
             </Modal.Body>
 
