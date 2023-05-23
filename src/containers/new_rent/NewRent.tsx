@@ -1,54 +1,58 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {IOption} from "../../types/types";
-import {Button, Container, Form, FormGroup, FormLabel} from "react-bootstrap";
+import {Button, Col, Container, Form, FormGroup, FormLabel, Row} from "react-bootstrap";
 import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
 import InputMask from "react-input-mask";
 import {useStores} from "../../store/RootStore";
-import {SelectBoxModal} from "./SelectBoxModal";
+import SelectBoxModal from "./SelectBoxModal";
 import clsx from "clsx";
+import {observer} from "mobx-react-lite";
+import SuccessModal from "../../components/modals/SuccessModal";
+import ErrorModal from "../../components/modals/ErrorModal";
 
-interface ICarCreateData {
-    carNumber: string;
-    renterName: IOption;
+export interface ICarCreateData {
+    automobileNumberRegion: string;
+    automobileNumber: string;
+    renter: IOption;
     renterPhone: string;
     renterAddress: string;
     renterReceiptNumber: string;
     model: IOption;
-    rentalStartDate: string;
+    boxId: number | null;
 }
 
 interface ICarCreateError {
-    carNumber: string;
-    renterName: string
+    automobileNumberRegion: string;
+    automobileNumber: string;
+    renter: string;
     renterPhone: string;
-    renterReceiptNumber: string;
     model: string;
-    rentalStartDate: string;
 }
 
 const initialCarData: ICarCreateData = {
-    carNumber: '',
-    renterName: new IOption("", ""),
-    renterPhone: '',
-    renterAddress: '',
-    renterReceiptNumber: '',
-    model: new IOption('', ''),
-    rentalStartDate: '',
-}
+    automobileNumber: "",
+    automobileNumberRegion: "",
+    renter: new IOption("", ""),
+    renterPhone: "",
+    renterAddress: "",
+    renterReceiptNumber: "",
+    model: new IOption("", ""),
+    boxId: null,
+};
 
-const initialCarErrors: ICarCreateError  = {
-    carNumber: '',
-    renterName: '',
-    renterPhone: '',
-    renterReceiptNumber: '',
-    model: '',
-    rentalStartDate: '',
-}
+const initialCarErrors: ICarCreateError = {
+    automobileNumber: "",
+    automobileNumberRegion: "",
+    renter: "",
+    renterPhone: "",
+    /*renterReceiptNumber: '',*/
+    model: "",
+};
 
-export const NewRent = () => {
-    const { modelsStore, clientsStore} = useStores();
+const NewRent = () => {
+    const { modelsStore, clientsStore, newCarStore } = useStores();
 
     const [models, setModels] = useState<IOption[]>([]);
     const [renters, setRenters] = useState<IOption[]>([]);
@@ -61,216 +65,304 @@ export const NewRent = () => {
 
     useEffect(() => {
         modelsStore.loadAll().then(() => {
-            const modelsList = modelsStore.modelsList.map((model) => new IOption(model.id_model.toString(), model.name));
+            const modelsList = modelsStore.modelsList.map(
+                (model) => new IOption(model.id_model.toString(), model.name),
+            );
             setModels(modelsList);
-        })
-
-        clientsStore.loadAll().then(() => {
-            const clientsList = clientsStore.clientsList.map((client) => new IOption(client.id_renter.toString(), client.full_name));
-            setRenters(clientsList);
-            console.log(clientsList)
         });
 
-    }, [])
+        clientsStore.loadAll().then(() => {
+            const clientsList = clientsStore.clientsList.map(
+                (client) => new IOption(client.id_renter.toString(), client.full_name),
+            );
+            setRenters(clientsList);
+        });
+    }, []);
 
-
-    const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        /*const _errors = Object.assign({}, errors);
-        if (!data.renterName) _errors.renterName = "Введите значение";
-        if (!data.renterPhone) _errors.renterPhone = "Введите значение";
-        // if (!data.renterReceiptNumber) _errors.renterReceiptNumber = "Введите значение";
-        if (!data.model) _errors.model =
-
-        setErrors(_errors);*/
+    const showFreeBoxes = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
 
         const _errors = Object.assign({}, errors);
+
+        debugger;
         Object.keys(errors).forEach((key) => {
-            // @ts-ignore
-            if (!data[key]) _errors[key] = "Введите значение";
+            if (["model", "renter"].includes(key)) {
+                // @ts-ignore
+                if (!data[key].label) {
+                    // @ts-ignore
+                    _errors[key] = "Введите значение";
+                }
+            } else {
+                // @ts-ignore
+                if (!data[key]) _errors[key] = "Введите значение";
+            }
         });
 
         if (!Object.values(_errors).filter((v) => v).length) {
             setShowFreeBoxesModal(true);
-        } else {
-            setErrors(_errors);
+            return;
         }
-    }
+
+        setErrors(_errors);
+    };
 
     const modelCustomStyles = {
         // @ts-ignore
         control: (base, state) => ({
             ...base,
-            borderColor: errors.model ? '#dc3545' : '#ddd',
-            '&:hover': {
-                borderColor: state.isFocused ? '#ddd'
-                    : errors.model ? '#dc3545' : '#ddd'
-            }
-        })
-    }
+            borderColor: errors.model ? "#dc3545" : "#ddd",
+            "&:hover": {
+                borderColor: state.isFocused ? "#ddd" : errors.model ? "#dc3545" : "#ddd",
+            },
+        }),
+    };
 
     const renterCustomStyles = {
         // @ts-ignore
         control: (base, state) => ({
             ...base,
-            borderColor: errors.renterName ? '#dc3545' : '#ddd',
-            '&:hover': {
-                borderColor: state.isFocused ? '#ddd'
-                    : errors.model ? '#dc3545' : '#ddd'
-            }
-        })
-    }
+            borderColor: errors.renter ? "#dc3545" : "#ddd",
+            "&:hover": {
+                borderColor: state.isFocused ? "#ddd" : errors.model ? "#dc3545" : "#ddd",
+            },
+        }),
+    };
 
     const onSelectRenter = (value: string | IOption | null) => {
         if (!value) {
             setData({
-                ...data, renterName: new IOption('', ''), renterPhone: '', renterAddress: '', renterReceiptNumber: ''
-            })
+                ...data,
+                renter: new IOption("", ""),
+                renterPhone: "",
+                renterAddress: "",
+                renterReceiptNumber: "",
+            });
             setClientEditable(false);
+            setErrors({ ...errors, renter: "" });
             return;
         }
 
-        setErrors({...errors, model: ''});
+        setErrors({ ...errors, renter: "" });
 
         if (typeof value === "string") {
             setData({
-                ...data, renterName: new IOption('', value), renterPhone: '', renterAddress: '', renterReceiptNumber: ''
-            })
+                ...data,
+                renter: new IOption("", value),
+                renterPhone: "",
+                renterAddress: "",
+                renterReceiptNumber: "",
+            });
             setClientEditable(true);
             return;
         }
 
         const renter = clientsStore.getById(value.value);
         setData({
-            ...data, renterName: value, renterPhone: renter.phone, renterAddress: renter.address, renterReceiptNumber: renter.receipt_number.toString()
+            ...data,
+            renter: value,
+            renterPhone: renter.phone,
+            renterAddress: renter.address,
+            renterReceiptNumber: renter.receipt_number.toString(),
         });
         setClientEditable(false);
-    }
+    };
 
     const onChangeSelect = (name: string, value: string | IOption | null) => {
         if (!value) {
             setData({
-                ...data, [name]: {
-                    value: '',
-                    label: ''
-                }
-            })
+                ...data,
+                [name]: {
+                    value: "",
+                    label: "",
+                },
+            });
             return;
         }
 
-        setErrors({...errors, model: ''});
+        setErrors({ ...errors, model: "" });
 
         if (typeof value === "string") {
             setData({
-                ...data, [name]: {
-                    value: '',
-                    label: value
-                }
-            })
+                ...data,
+                [name]: {
+                    value: "",
+                    label: value,
+                },
+            });
             return;
         }
 
         setData({
-            ...data, [name]: value
+            ...data,
+            [name]: value,
         });
-    }
+    };
 
     const onChange = (name: string, value: string) => {
-        setData({...data, [name]: value});
+        if (value) setErrors({ ...errors, [name]: "" });
+        setData({ ...data, [name]: value });
     };
 
     const onBlurMaskedInput = (name: string, value: string) => {
-        if (!value || value.includes("_")) setErrors({...errors, [name]: "Некорректное значение"})
-    }
+        if (!value || value.includes("_")) setErrors({ ...errors, [name]: "Некорректное значение" });
+    };
 
     const onFocusMaskedInput = (name: string, value: string) => {
-        setErrors({...errors, [name]: ""})
-    }
+        setErrors({ ...errors, [name]: "" });
+    };
 
     const phoneClassName = clsx(
-        'form-control',
-        { 'phone-control': !errors.renterPhone },
-        { 'phone-control-danger': errors.renterPhone }
+        "form-control",
+        { "phone-control": !errors.renterPhone },
+        { "phone-control-danger": errors.renterPhone },
     );
 
-    const onCloseFreeBoxesModal = () => {
+    const closeFreeBoxesModal = () => {
         setShowFreeBoxesModal(false);
     };
 
+    async function onSubmit(id: number) {
+        console.log(data, id);
+
+        await newCarStore.saveNewCar({ ...data, boxId: id });
+
+        closeFreeBoxesModal();
+        setData(initialCarData);
+        setErrors(initialCarErrors);
+    }
+
+    function clear() {
+        setData(initialCarData);
+        setErrors(initialCarErrors);
+    }
+
     return (
-        <Container>
-            <Form onSubmit={onSubmit}>
-                <FormGroup className="mb-3">
-                    <FormLabel className="required-p">Клиент</FormLabel>
-                    <CreatableSelect
-                        styles={renterCustomStyles}
-                        isClearable
-                        onChange={(newValue) => onSelectRenter(newValue)}
-                        onCreateOption={(newValue) => onSelectRenter(newValue)}
-                        value={data.renterName}
-                        options={renters}
-                    />
-                    {errors?.renterName &&
-                        <div style={{color: "#dc3545", fontSize: ".875em", marginTop: "5px"}}>{errors.renterName}</div>}
-                </FormGroup>
+        <>
+            <Container>
+                <Form>
+                    <FormGroup className="mb-3">
+                        <FormLabel className="required-p">Клиент</FormLabel>
+                        <CreatableSelect
+                            styles={renterCustomStyles}
+                            isClearable
+                            onChange={(newValue) => onSelectRenter(newValue)}
+                            onCreateOption={(newValue) => onSelectRenter(newValue)}
+                            value={data.renter}
+                            options={renters}
+                        />
+                        {errors?.renter && (
+                            <div style={{ color: "#dc3545", fontSize: ".875em", marginTop: "5px" }}>
+                                {errors.renter}
+                            </div>
+                        )}
+                    </FormGroup>
 
-                <Form.Group className="mb-3">
-                    <Form.Label className="required-p" >Телефон</Form.Label>
-                    <InputMask className={phoneClassName}
-                               mask="+9(999) 999-9999"
-                               name={"renterPhone"}
-                               value={data.renterPhone}
-                               onChange={(e) => onChange(e.target.name, e.target.value)}
-                               onBlur={(e) => onBlurMaskedInput(e.target.name, e.target.value)}
-                               onFocus={(e) => onFocusMaskedInput(e.target.name, e.target.value)}
-                               required
-                               readOnly={!isClientEditable}
-                    />
-                    {errors.renterPhone && <div style={{color: "#dc3545", fontSize: ".875em", marginTop: "5px"}}>{errors.renterPhone}</div>}
-                </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label className="required-p">Телефон</Form.Label>
+                        <InputMask
+                            className={phoneClassName}
+                            mask="+9(999) 999-9999"
+                            name={"renterPhone"}
+                            value={data.renterPhone}
+                            onChange={(e) => onChange(e.target.name, e.target.value)}
+                            onBlur={(e) => onBlurMaskedInput(e.target.name, e.target.value)}
+                            onFocus={(e) => onFocusMaskedInput(e.target.name, e.target.value)}
+                            required
+                            readOnly={!isClientEditable}
+                        />
+                        {errors.renterPhone && (
+                            <div style={{ color: "#dc3545", fontSize: ".875em", marginTop: "5px" }}>
+                                {errors.renterPhone}
+                            </div>
+                        )}
+                    </Form.Group>
 
-                <Form.Group className="mb-3">
-                    <Form.Label>Адрес</Form.Label>
-                    <Form.Control
-                        name="renterAddress"
-                        onChange={(e) => onChange(e.target.name, e.target.value)}
-                        value={data.renterAddress}
-                        type="text"
-                        readOnly={!isClientEditable}
-                    />
-                </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Адрес</Form.Label>
+                        <Form.Control
+                            name="renterAddress"
+                            onChange={(e) => onChange(e.target.name, e.target.value)}
+                            value={data.renterAddress}
+                            type="text"
+                            readOnly={!isClientEditable}
+                            autoComplete={"off"}
+                        />
+                    </Form.Group>
 
-                <Form.Group className="mb-3">
-                    <Form.Label className="required-p">Модель</Form.Label>
-                    <Select
-                        styles={modelCustomStyles}
-                        name="model"
-                        value={data.model}
-                        placeholder={"Название модели"}
-                        onChange={(newValue) => onChangeSelect("model", newValue)}
-                        options={models}
-                    />
-                    {errors.model && <div style={{color: "#dc3545", fontSize: ".875em", marginTop: "5px"}}>{errors.model}</div>}
-                </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label className="required-p">Модель</Form.Label>
+                        <Select
+                            styles={modelCustomStyles}
+                            name="model"
+                            value={data.model}
+                            placeholder={"Название модели"}
+                            onChange={(newValue) => onChangeSelect("model", newValue)}
+                            options={models}
+                        />
+                        {errors.model && (
+                            <div style={{ color: "#dc3545", fontSize: ".875em", marginTop: "5px" }}>{errors.model}</div>
+                        )}
+                    </Form.Group>
 
-                <Form.Group className="mb-3">
-                    <Form.Label className="required-p">Номер машины</Form.Label>
-                    <Form.Control
-                        name="carNumber"
-                        value={data.carNumber}
-                        type="text"
-                        onChange={(e) => onChange(e.target.name, e.target.value)}
-                    />
-                    <Form.Control.Feedback type="invalid">Введите номер машины</Form.Control.Feedback>
-                </Form.Group>
+                    <Row>
+                        <Col>
+                            <Form.Group className="mb-3">
+                                <Form.Label className="required-p">Номер машины</Form.Label>
+                                <Form.Control
+                                    name="automobileNumber"
+                                    value={data.automobileNumber}
+                                    type="text"
+                                    onChange={(e) => onChange(e.target.name, e.target.value)}
+                                    isInvalid={!!errors.automobileNumber}
+                                    autoComplete={"off"}
+                                />
+                                <Form.Control.Feedback type="invalid">{errors.automobileNumber}</Form.Control.Feedback>
+                            </Form.Group>
+                        </Col>
+                        <Col>
+                            <Form.Group className="mb-3">
+                                <Form.Label className="required-p">Регион</Form.Label>
+                                <Form.Control
+                                    name="automobileNumberRegion"
+                                    value={data.automobileNumberRegion}
+                                    type="text"
+                                    onChange={(e) => onChange(e.target.name, e.target.value)}
+                                    isInvalid={!!errors.automobileNumberRegion}
+                                    autoComplete={"off"}
+                                />
+                                <Form.Control.Feedback type="invalid">{errors.automobileNumber}</Form.Control.Feedback>
+                            </Form.Group>
+                        </Col>
+                    </Row>
 
-                <Button variant="warning" type="submit" className={"mb-3"}>
-                    Подобрать бокс
-                </Button>
-            </Form>
+                    <Button onClick={showFreeBoxes} variant="warning" type="submit" className={"mb-3 me-3"}>
+                        Подобрать бокс
+                    </Button>
+                    <Button onClick={clear} variant="secondary" type="reset" className={"mb-3"}>
+                        Очистить
+                    </Button>
+                </Form>
 
-            {<SelectBoxModal show={showFreeBoxesModal} id={data.model.value} closeCallback={onCloseFreeBoxesModal}/>}
-        </Container>
+                <SelectBoxModal
+                    show={showFreeBoxesModal}
+                    id={data.model.value}
+                    closeCallback={closeFreeBoxesModal}
+                    submitCallback={onSubmit}
+                />
+            </Container>
+
+            <SuccessModal
+                show={!!newCarStore.successMessage}
+                closeCallback={() => newCarStore.clearSuccessMessage()}
+                message={newCarStore.successMessage}
+            />
+            <ErrorModal
+                show={!!newCarStore.errorMessage}
+                closeCallback={() => newCarStore.clearErrorMessage()}
+                message={newCarStore.errorMessage}
+            />
+        </>
     );
-}
+};
+
+export default observer(NewRent);

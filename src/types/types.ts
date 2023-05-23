@@ -4,11 +4,11 @@
 
 export interface IModelResponse {
     id_model: number;
-    name: string
+    name: string;
 }
 
 export interface IModelCreate {
-    name: string
+    name: string;
 }
 
 /**
@@ -29,12 +29,11 @@ export interface IBoxCreate {
     daily_cost: number;
 }
 
-
 /**
  * Клиент.
  */
 
-export interface IRenter {
+export interface IRenterResponse {
     id_renter: number;
     full_name: string;
     phone: string;
@@ -55,17 +54,18 @@ export interface IRenterCreate {
 
 export interface ICarResponse {
     car_number: number;
+    automobile_number: string;
     box_number: number;
-    renter_name: string;
+    renter_full_name: string;
     model_name: string;
     rental_start_date: string;
 }
 
 export interface ICarCreate {
-    car_number: number;
+    automobile_number: string;
     box_number: number;
-    id_renter: number;
-    id_model: number;
+    id_renter: number | null;
+    id_model: number | null;
     rental_start_date: string;
 }
 
@@ -96,12 +96,11 @@ export class IOption {
 }
 
 export function getOptions<Obj, Key extends keyof Obj>(arr: Obj[], keyValue: Key, keyLabel: Key) {
-    return arr.map((el) => ({value: el[keyValue], label: el[keyLabel]} as IOption))
+    return arr.map((el) => ({ value: el[keyValue], label: el[keyLabel] } as IOption));
 }
 
 export function getOption<Obj, Key extends keyof Obj>(obj: Obj | null, keyValue: Key, keyLabel: Key) {
-    if (!obj) return {value: "", label: ""};
+    if (!obj) return { value: "", label: "" };
 
-    return {value: obj[keyValue], label: obj[keyLabel]} as IOption;
+    return { value: obj[keyValue], label: obj[keyLabel] } as IOption;
 }
-

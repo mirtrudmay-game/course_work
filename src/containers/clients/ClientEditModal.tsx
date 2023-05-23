@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {FC, useEffect, useState} from 'react';
 import {Button, ButtonToolbar, Form, Modal} from "react-bootstrap";
-import {IRenter} from "../../types/types";
+import {IRenterResponse} from "../../types/types";
 import {observer} from "mobx-react-lite";
 import InputMask from "react-input-mask";
 import {IModal} from "../boxes/IncreaseCostModal";
@@ -24,10 +24,10 @@ const initialErrors: IEditClientErrors = {
     phone: '',
 }
 
-const ClientEditModal: FC<IEditModal<IRenter>> = ({closeCallback, show, initialData}) => {
+const ClientEditModal: FC<IEditModal<IRenterResponse>> = ({closeCallback, show, initialData}) => {
     const { clientsStore} = useStores();
 
-    const [data, setData] = useState<IRenter>(initialData);
+    const [data, setData] = useState<IRenterResponse>(initialData);
     const [errors, setErrors] = useState<IEditClientErrors>(initialErrors);
 
     useEffect(() => {

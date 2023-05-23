@@ -1,5 +1,5 @@
-import * as React from 'react';
-import {useEffect, useState} from 'react';
+import * as React from "react";
+import {useEffect, useState} from "react";
 import {Button, ButtonToolbar, Col, Container, Dropdown, Row} from "react-bootstrap";
 import Table from "../../components/Table/Table";
 import {boxTableColumns} from "../../data/data";
@@ -11,39 +11,42 @@ import SuccessModal from "../../components/modals/SuccessModal";
 import {Tooltip} from "../../components/Tooltip";
 import {IncreaseCostModal} from "./IncreaseCostModal";
 import {useStores} from "../../store/RootStore";
+import {FileMenuItem} from "../../components/FileMenuItem";
 
 const Boxes = () => {
-    const { boxesStore } = useStores();
+    const { boxesStore, filesStore } = useStores();
     useEffect(() => {
         boxesStore.loadAll();
-    }, [])
+    }, []);
 
     const [showCreateBoxModal, setShowCreateBoxModal] = useState<boolean>(false);
     const [showIncreaseCostModal, setShowIncreaseCostModal] = useState<boolean>(false);
 
     const createBoxClickHandler = () => {
         setShowCreateBoxModal(true);
-    }
+    };
 
     const closeCreateBoxModalHandler = () => {
-        setShowCreateBoxModal(false)
-    }
+        setShowCreateBoxModal(false);
+    };
 
     const removeBoxClickHandler = () => {
         boxesStore.deleteSelectedBox();
-    }
+    };
 
-    const selectRowHandler = (indexes: Record<string, boolean>) => {
-        boxesStore.setSelectedBox(indexes);
-    }
+    const selectRowHandler = (index: number) => {
+        boxesStore.setSelectedBox(index);
+    };
 
     const increaseCostClickHandler = () => {
         setShowIncreaseCostModal(true);
-    }
+    };
 
     const closeIncreaseCostClickHandler = () => {
         setShowIncreaseCostModal(false);
-    }
+    };
+
+    const getXMLPath = () => {};
 
     return (
         <>
@@ -51,19 +54,28 @@ const Boxes = () => {
                 <Row className="my-4">
                     <ButtonToolbar>
                         <Tooltip text="Добавить бокс">
-                            <Button variant="success" className="me-2" onClick={createBoxClickHandler}><i
-                                className="bi-plus-lg"></i></Button>
+                            <Button variant="success" className="me-2" onClick={createBoxClickHandler}>
+                                <i className="bi-plus-lg"></i>
+                            </Button>
                         </Tooltip>
                         <Tooltip text="Удалить выбранный бокс">
-                            <Button variant="danger" disabled={boxesStore.selectedBoxesIdx < 0} data-bs-toggle="tooltip"
-                                    data-bs-html="true" title="<em>Подсказка</em>" className="me-2"
-                                    onClick={removeBoxClickHandler}><i className="bi-trash"/></Button>
+                            <Button
+                                variant="danger"
+                                disabled={boxesStore.selectedBoxId === null}
+                                data-bs-toggle="tooltip"
+                                data-bs-html="true"
+                                title="<em>Подсказка</em>"
+                                className="me-2"
+                                onClick={removeBoxClickHandler}
+                            >
+                                <i className="bi-trash" />
+                            </Button>
                         </Tooltip>
                         <Tooltip text="Увеличить стоимость аренды всех боксов">
-                            <Button variant="outline-dark" className="me-2" onClick={increaseCostClickHandler}><i
-                                className="bi-pen"/></Button>
+                            <Button variant="outline-dark" className="me-2" onClick={increaseCostClickHandler}>
+                                <i className="bi-pen" />
+                            </Button>
                         </Tooltip>
-
 
                         <Dropdown>
                             <Tooltip text="Получить справку">
@@ -73,34 +85,53 @@ const Boxes = () => {
                             </Tooltip>
 
                             <Dropdown.Menu className={"mt-1"}>
-                                <Dropdown.Item href="#/action-1"><span className="py-2 px-2"><i
-                                    className="bi-download me-3"></i>О пустых боксах</span></Dropdown.Item>
-                                <Dropdown.Item href="#/action-3"><span className="py-2 px-2"><i
-                                    className="bi-download me-3"></i>О всех моделях
-                            машин</span></Dropdown.Item>
-                                <Dropdown.Item href="#/action-2" disabled={boxesStore.selectedBoxesIdx < 0}>
-                            <span className="py-2 px-2"><i className="bi-download me-3"></i>
-                                О клиенте, занимающем выбранный бокс</span></Dropdown.Item>
-
+                                <FileMenuItem
+                                    title={"О пустых боксах"}
+                                    onClick={() => filesStore.loadXml("free_boxes", null)}
+                                />
+                                <FileMenuItem
+                                    title={"О всех моделях машин"}
+                                    onClick={() => filesStore.loadXml("free_boxes", null)}
+                                />
+                                <FileMenuItem
+                                    title={"О клиенте, занимающем выбранный бокс"}
+                                    isDisabled={boxesStore.selectedBoxId === null}
+                                    onClick={() =>
+                                        filesStore.loadXml(`client_in_box`, { box_number: boxesStore.selectedBoxId })
+                                    }
+                                />
                             </Dropdown.Menu>
                         </Dropdown>
                     </ButtonToolbar>
                 </Row>
                 <Row>
                     <Col>
-                        <Table<IBoxResponse> selectRowCallback={selectRowHandler} columns={boxTableColumns}
-                                             data={boxesStore.boxesList}/>
+                        <Table<IBoxResponse>
+                            selectRowCallback={selectRowHandler}
+                            columns={boxTableColumns}
+                            data={boxesStore.boxesList}
+                        />
                     </Col>
                 </Row>
             </Container>
 
-            {<BoxCreateModal show={showCreateBoxModal} closeCallback={closeCreateBoxModalHandler}/>}
-            {<IncreaseCostModal show={showIncreaseCostModal} closeCallback={closeIncreaseCostClickHandler}/>}
+            {<BoxCreateModal show={showCreateBoxModal} closeCallback={closeCreateBoxModalHandler} />}
+            {<IncreaseCostModal show={showIncreaseCostModal} closeCallback={closeIncreaseCostClickHandler} />}
 
-            {<SuccessModal show={!!boxesStore.successMessage} closeCallback={() => boxesStore.clearSuccessMessage()}
-                           message={boxesStore.successMessage}/>}
-            {<ErrorModal show={!!boxesStore.errorMessage} closeCallback={() => boxesStore.clearErrorMessage()}
-                         message={boxesStore.errorMessage}/>}
+            {
+                <SuccessModal
+                    show={!!boxesStore.successMessage}
+                    closeCallback={() => boxesStore.clearSuccessMessage()}
+                    message={boxesStore.successMessage}
+                />
+            }
+            {
+                <ErrorModal
+                    show={!!boxesStore.errorMessage}
+                    closeCallback={() => boxesStore.clearErrorMessage()}
+                    message={boxesStore.errorMessage}
+                />
+            }
         </>
     );
 };

@@ -30,9 +30,6 @@ export class ModelsStore implements IModelsStore {
         }
     }
 
-    async createModel(value: string) {
-
-    }
 
     getById(id: string | undefined): IModelResponse | null {
         if (!id) return null;

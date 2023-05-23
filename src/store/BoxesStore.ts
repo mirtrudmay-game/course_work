@@ -5,14 +5,14 @@ import {RootStore} from "./RootStore";
 
 interface IBoxesStore {
     boxesList: IBoxResponse[];
-    selectedBoxesIdx: number;
+    selectedBoxId: number | null;
     errorMessage: string;
     successMessage: string;
 }
 
 export class BoxesStore implements IBoxesStore {
     boxesList: IBoxResponse[] = [];
-    selectedBoxesIdx: number = -1;
+    selectedBoxId: number | null = null;
     errorMessage: string = "";
     successMessage: string = "";
 
@@ -29,33 +29,30 @@ export class BoxesStore implements IBoxesStore {
 
             runInAction(() => {
                 this.boxesList = response.data;
-            })
-
+                this.selectedBoxId = null;
+            });
         } catch (e: any) {
-            this.errorMessage = "Не удаётся получить список боксов."
+            this.errorMessage = "Не удаётся получить список боксов.";
         }
-
-        /*this.boxesList = boxes;*/
     }
 
-
     async deleteSelectedBox() {
-        let response;
-
         try {
-            const id = this.boxesList[+this.selectedBoxesIdx].box_number;
-            console.log("Удаляем бокс №", id);
+            console.log("Удаляем бокс №", this.selectedBoxId);
 
-            await axios.delete(`/data-service/boxes/delete/${id}`);
+            await axios.delete(`/data-service/boxes/delete/${this.selectedBoxId}`);
 
             // ИЛИ delete this.boxesList[+this.selectedBoxesIdx];
 
             await this.loadAll();
-            this.successMessage = "Бокс успешно удалён.";
 
+            runInAction(() => {
+                this.successMessage = "Бокс успешно удалён.";
+            });
         } catch (error) {
             if ((error as AxiosError)?.response?.status === 400) {
-                this.errorMessage = "Ошибка удаления. Выбранный бокс содержит автомобиль. Прежде чем удалить бокс, его необходимо освободить.";
+                this.errorMessage =
+                    "Ошибка удаления. Выбранный бокс содержит автомобиль. Прежде чем удалить бокс, его необходимо освободить.";
             } else {
                 this.errorMessage = "Ошибка удаления.";
             }
@@ -68,17 +65,18 @@ export class BoxesStore implements IBoxesStore {
         try {
             if (!box.id_model) {
                 const model: IModelCreate = {
-                    name: box.model_name
-                }
+                    name: box.model_name,
+                };
 
                 console.log("Сохраняем модель", model);
 
                 const modelResponse = await axios.post<IModelResponse>("/data-service/models/add", model);
-                box.id_model = modelResponse.data.id_model;
 
+                runInAction(() => {
+                    box.id_model = modelResponse.data.id_model;
+                });
                 await this.rootStore.modelsStore.loadAll();
             }
-
 
             console.log("А теперь собранный бокс", box);
             await axios.post("/data-service/boxes/add", box);
@@ -86,36 +84,26 @@ export class BoxesStore implements IBoxesStore {
             // ИЛИ this.boxesList.push(box)
 
             await this.loadAll();
-            this.successMessage = "Бокс успешно добавлен.";
 
+            runInAction(() => {
+                this.successMessage = "Бокс успешно добавлен.";
+            });
         } catch (error) {
-            this.errorMessage = "Ошибка добавления бокса."
+            this.errorMessage = "Ошибка добавления бокса.";
         }
-
     }
-
 
     async increaseCost(coef: number) {
-        console.log("increasecost", coef)
-        /*try {
-            await axios.post(`/data-service/boxes/costUp/${coef}`);
+        try {
+            await axios.post(`/data-service/boxes/costUp/`, { coef: coef });
             this.loadAll();
         } catch (e) {
-            this.errorMessage = "Не удаётся выполнить операцию."
-        }*/
-
-        /*this.boxesList.forEach((box) => box.daily_cost *= coef);*/
+            this.errorMessage = "Не удаётся выполнить операцию.";
+        }
     }
 
-    setSelectedBox(indexes: Record<string, boolean>) {
-        const selectedList = Object.entries(indexes).filter(([idx, value]) => value);
-
-        if (selectedList.length > 0) {
-            this.selectedBoxesIdx = +selectedList[0][0];
-            return;
-        }
-        this.selectedBoxesIdx = -1;
-
+    setSelectedBox(index: number) {
+        this.selectedBoxId = index < 0 ? null : this.boxesList[index].box_number;
     }
 
     clearErrorMessage() {
@@ -125,5 +113,4 @@ export class BoxesStore implements IBoxesStore {
     clearSuccessMessage() {
         this.successMessage = "";
     }
-
 }

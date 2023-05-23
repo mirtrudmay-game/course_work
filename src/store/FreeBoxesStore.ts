@@ -5,17 +5,15 @@ import {RootStore} from "./RootStore";
 
 interface IBoxesStore {
     freeBoxesList: IBoxResponse[];
-    selectedBoxesIdx: number;
-    successMessage: string;
+    selectedBoxId: number | null;
     errorMessage: string;
 }
 
 export class FreeBoxesStore implements IBoxesStore {
     freeBoxesList: IBoxResponse[] = [];
-    selectedBoxesIdx: number = -1;
-    successMessage: string = "";
-
+    selectedBoxId: number | null = null;
     errorMessage: string = "";
+
     private rootStore: RootStore;
 
     constructor(rootStore: RootStore) {
@@ -25,19 +23,26 @@ export class FreeBoxesStore implements IBoxesStore {
 
     async loadFreeByModelId(id: string): Promise<void> {
         try {
-            const response = await axios.get<IBoxResponse[]>(`/data-service/boxes/freeByModel/${id}`);
+            /*const response = await axios.get<IBoxResponse[]>(`/data-service/boxes/freeByModel/${id}`);
 
             runInAction(() => {
                 this.freeBoxesList = response.data;
-            })
+            })*/
 
+            const response = await axios.get<IBoxResponse[]>(`/data-service/boxes/free`);
+            const boxesList: IBoxResponse[] = response.data;
+
+            runInAction(() => {
+                this.freeBoxesList = boxesList.filter((box) => box.id_model == +id);
+                this.selectedBoxId = null;
+            });
         } catch (e: any) {
-            this.errorMessage = "Не удаётся получить список пустых боксов для заданной модели."
+            this.errorMessage = "Не удаётся получить список пустых боксов для заданной модели.";
         }
     }
 
-
-    setSelectedBox(indexes: Record<string, boolean>) {
-
+    setSelectedBox(index: number) {
+        debugger;
+        this.selectedBoxId = index < 0 ? null : this.freeBoxesList[index].box_number;
     }
 }
