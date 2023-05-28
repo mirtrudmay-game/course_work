@@ -1,3 +1,5 @@
+import {IChartElement} from "../types/types";
+
 export const boxTableColumns = [
     {
         Header: "Номер бокса",
@@ -48,5 +50,19 @@ export const carsTableColumns = [
     {
         Header: "Дата начала аренды",
         accessor: "rental_start_date",
+    },
+];
+export const chartData: IChartElement[] = [
+    {
+        model_name: "Opel",
+        count: 5,
+    },
+    {
+        model_name: "Ford",
+        count: 10,
+    },
+    {
+        model_name: "Kia",
+        count: 3,
     },
 ];

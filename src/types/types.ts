@@ -85,6 +85,11 @@ export interface CarInput {
     rentalStartDate: Date;
 }*/
 
+export interface IChartElement {
+    model_name: string;
+    count: number;
+}
+
 export class IOption {
     value: string;
     label: string;

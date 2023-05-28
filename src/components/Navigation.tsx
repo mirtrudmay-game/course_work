@@ -35,6 +35,11 @@ export const Navigation = () => {
                                 Новое бронирование
                             </Nav.Link>
                         </Nav.Item>
+                        <Nav.Item as="li" className="fw-semibold">
+                            <Nav.Link eventKey={"link-4"} as={Link} to="/statistics">
+                                Статистика
+                            </Nav.Link>
+                        </Nav.Item>
                     </Nav>
                 </Container>
             </Navbar>

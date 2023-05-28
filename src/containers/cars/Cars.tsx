@@ -16,7 +16,7 @@ const Cars: React.FC<CarsProps> = ({}) => {
 
     useEffect(() => {
         carsStore.loadAll();
-    });
+    }, []);
 
     function removeBoxClickHandler() {
         carsStore.deleteSelectedCar();

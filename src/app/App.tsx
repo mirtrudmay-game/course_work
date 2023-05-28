@@ -6,6 +6,8 @@ import {Navigation} from "../components/Navigation";
 import Boxes from "../containers/boxes/Boxes";
 import NewRent from "../containers/new_rent/NewRent";
 import Cars from "../containers/cars/Cars";
+import Dashboard from "../dashboard/Dashboard";
+import {WelcomePage} from "../containers/welcome/WelcomePage";
 
 const App = () => {
     return (
@@ -13,10 +15,12 @@ const App = () => {
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<Navigation />}>
+                        <Route path="/" element={<WelcomePage />} />
                         <Route path="boxes" element={<Boxes />} />
                         <Route path="clients" element={<Clients />} />
                         <Route path="cars" element={<Cars />} />
                         <Route path="new-rent" element={<NewRent />} />
+                        <Route path="statistics" element={<Dashboard />} />
                     </Route>
                 </Routes>
             </BrowserRouter>

@@ -19,15 +19,29 @@ export class NewCarStore implements ICarsStore {
         makeAutoObservable(this);
     }
 
+    complementWithZeros = (date: number) => {
+        return date < 10 ? `0${date.toString()}` : date.toString();
+    };
+
+    getFormattedDate = (d: Date) => {
+        return (
+            this.complementWithZeros(d.getDate()) +
+            "." +
+            this.complementWithZeros(d.getMonth() + 1) +
+            "." +
+            d.getFullYear()
+        );
+    };
+
     async saveNewCar(data: ICarCreateData): Promise<void> {
         console.log("Сохраняем объект", data);
 
         const car: ICarCreate = {
-            automobile_number: `${data.automobileNumber}| ${data.automobileNumberRegion}`,
+            automobile_number: `${data.automobileNumber} | ${data.automobileNumberRegion}`,
             box_number: +data.boxId!,
             id_renter: +data.renter.value || null,
             id_model: +data.model.value,
-            rental_start_date: new Date().toDateString(),
+            rental_start_date: this.getFormattedDate(new Date()),
         };
 
         try {
