@@ -69,25 +69,10 @@ export interface ICarCreate {
     rental_start_date: string;
 }
 
-/*export interface Car {
-    carNumber: number;
-    box: BoxInput;
-    renter: IRenter;
-    model: IModel;
-    rentalStartDate: Date;
-}
-
-export interface CarInput {
-    carNumber: number | null;
-    box: BoxInput | null;
-    renter: IRenter;
-    model: IModel | null;
-    rentalStartDate: Date;
-}*/
-
 export interface IChartElement {
     model_name: string;
-    count: number;
+    count_box: number;
+    count_car: number;
 }
 
 export class IOption {

@@ -55,14 +55,17 @@ export const carsTableColumns = [
 export const chartData: IChartElement[] = [
     {
         model_name: "Opel",
-        count: 5,
+        count_box: 10,
+        count_car: 3,
     },
     {
         model_name: "Ford",
-        count: 10,
+        count_box: 20,
+        count_car: 10,
     },
     {
         model_name: "Kia",
-        count: 3,
+        count_box: 15,
+        count_car: 5,
     },
 ];

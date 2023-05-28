@@ -6,7 +6,12 @@ import {chartData} from "../data/data";
 
 interface IChartStore {
     dataDought: ChartData<"doughnut">;
+    dataBar: ChartData<"bar">;
     optionsDought: ChartOptions<"doughnut">;
+    optionsBar: ChartOptions<"bar">;
+    totalBoxNumber: number;
+    freeBoxNumber: number;
+    totalCarNumber: number;
 }
 
 export class ChartStore implements IChartStore {
@@ -15,6 +20,22 @@ export class ChartStore implements IChartStore {
         datasets: [],
     };
 
+    optionsBar: ChartOptions<"bar"> = {
+        /*scales: {
+            y: {
+                beginAtZero: true,
+            },
+        },*/
+    };
+
+    dataBar: ChartData<"bar"> = {
+        labels: [],
+        datasets: [],
+    };
+    totalBoxNumber: number = 90;
+    freeBoxNumber: number = 25;
+
+    totalCarNumber: number = 65;
     optionsDought: ChartOptions<"doughnut"> = {
         devicePixelRatio: 2.0,
         layout: {
@@ -27,7 +48,6 @@ export class ChartStore implements IChartStore {
                 font: {
                     size: 18,
                 },
-                /!*align: "start",*!/
             },*/
             legend: {
                 display: true,
@@ -54,7 +74,6 @@ export class ChartStore implements IChartStore {
             },
         },
     };
-
     private rootStore: RootStore;
 
     constructor(rootStore: RootStore) {
@@ -62,7 +81,7 @@ export class ChartStore implements IChartStore {
         makeAutoObservable(this);
     }
 
-    private formatChartData = (data: IChartElement[]) => {
+    private formatChartDoughtData = (data: IChartElement[]) => {
         const result: ChartData<"doughnut"> = {
             labels: [],
             datasets: [],
@@ -72,12 +91,12 @@ export class ChartStore implements IChartStore {
 
         data.forEach((datum) => {
             result.labels?.push(datum.model_name);
-            dataSet.push(datum.count);
+            dataSet.push(datum.count_box);
         });
 
         result.datasets = [
             {
-                label: "Число автомобилей",
+                label: " Число автомобилей",
                 data: dataSet,
             },
         ];
@@ -91,8 +110,38 @@ export class ChartStore implements IChartStore {
             const data = chartData;
 
             runInAction(() => {
-                this.dataDought = this.formatChartData(data);
+                this.dataDought = this.formatChartDoughtData(data);
+                this.dataBar = this.formatChartBarData(data);
             });
         } catch (e: any) {}
     };
+
+    private formatChartBarData(data: IChartElement[]) {
+        const result: ChartData<"bar"> = {
+            labels: [],
+            datasets: [],
+        };
+
+        const dataSetBoxes: number[] = [];
+        const dataSetCars: number[] = [];
+
+        data.forEach((datum) => {
+            result.labels?.push(datum.model_name);
+            dataSetBoxes.push(datum.count_box);
+            dataSetCars.push(datum.count_car);
+        });
+
+        result.datasets = [
+            {
+                label: "Число боксов",
+                data: dataSetBoxes,
+            },
+            {
+                label: "Число автомобилей",
+                data: dataSetCars,
+            },
+        ];
+
+        return result;
+    }
 }
