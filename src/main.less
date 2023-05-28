@@ -1,56 +1,67 @@
 .navbar-nav .nav-item .nav-link {
-  min-width: 100px;
-  padding: 10px 20px;
-  text-align: center;
+    min-width: 100px;
+    padding: 10px 20px;
+    text-align: center;
 }
 
 .navbar-nav .nav-item .nav-link:focus {
-  background-color: white;
+    background-color: white;
 }
 
 .navbar-nav .nav-item .nav-link.active {
-  background-color: rgb(255, 193, 7);
+    background-color: rgb(255, 193, 7);
 }
 
 .nav-item > a:hover {
-  color: black;
+    color: black;
+}
+
+.nav-item > a {
+    color: rgba(0, 0, 0, 0.55);
 }
 
 .required:after {
-  content: "*";
-  color: red;
+    content: "*";
+    color: red;
 }
 
 .required-p:after {
-  content: "*";
-  color: red;
-  padding-left: 5px;
+    content: "*";
+    color: red;
+    padding-left: 5px;
 }
 
 .dropdown-toggle::after {
-  margin-left: 10px !important;
+    margin-left: 10px !important;
 }
 
 .dropdown-menu.show {
-  width: 450px;
-  padding-top: 12px;
-  padding-bottom: 12px;
+    width: 450px;
+    padding-top: 12px;
+    padding-bottom: 12px;
 }
 
 .dropdown-item {
-  height: 40px;
+    height: 40px;
 
-  &:hover {
-    background-color: white;
-    text-decoration: underline;
-  }
+    &:hover {
+        background-color: white;
+        text-decoration: underline;
+    }
 
-  &:active {
-    background-color: white;
-    color: black;
-  }
+    &:active {
+        background-color: white;
+        color: black;
+    }
 }
 
 .big-icon::before {
-  font-size: 30px;
+    font-size: 30px;
+}
+
+.welcome-header {
+    font-size: 70px;
+    font-weight: bold;
+    color: #707070;
+    margin: 100px 0 80px;
 }

@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {
     ArcElement,
     BarElement,
@@ -14,49 +14,42 @@ import {observer} from "mobx-react-lite";
 import {useStores} from "../store/RootStore";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import {Col, Row} from "react-bootstrap";
-import {Bar} from "react-chartjs-2";
+import {Bar, Doughnut} from "react-chartjs-2";
+import {InfoBlock} from "./InfoBlock";
 
 ChartJS.register(ArcElement, Tooltip, Legend, Colors, ChartDataLabels, Title, CategoryScale, LinearScale, BarElement);
 
-interface IInfoBlock {
-    desc: string;
-    count: number | string;
-}
-
-const InfoBlock: FC<IInfoBlock> = ({ desc, count }) => {
-    return (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-            {/*<hr className={"w-50"} />*/}
-            <span>{desc}</span>
-            <p style={{ fontSize: "40px", marginBottom: "1em" }}>{count}</p>
-        </div>
-    );
-};
-
 export type DashboardProps = {};
-const Dashboard: React.FC<DashboardProps> = ({}) => {
-    const { chartStore } = useStores();
-    const [freePercent, setFreePercent] = useState<number>(0);
 
-    const setData = async () => {
-        await chartStore.loadData();
-        setFreePercent(Math.round((chartStore.freeBoxNumber / chartStore.totalBoxNumber) * 10000) / 100);
-    };
+function ChartCards() {
+    const { chartDoughnutStore, chartBarStore } = useStores();
+    const [chartIdx, setChartIdx] = useState<number>(0);
 
     useEffect(() => {
-        setData();
+        chartDoughnutStore.loadData();
+        chartBarStore.loadData();
+    }, []);
+
+    if (!chartIdx) return <Bar options={chartBarStore.options} data={chartBarStore.data}></Bar>;
+    return <Doughnut options={chartDoughnutStore.options} data={chartDoughnutStore.data} />;
+}
+
+const Dashboard: React.FC<DashboardProps> = ({}) => {
+    const { dashboardStore } = useStores();
+
+    useEffect(() => {
+        dashboardStore.loadData();
     }, []);
 
     return (
-        <Row className={"align-items-center"}>
+        <Row className={"align-items-center"} style={{ height: "80vh" }}>
             <Col xs={{ span: 5, offset: 1 }}>
-                {/*<Doughnut options={chartStore.optionsDought} data={chartStore.dataDought} />*/}
-                <Bar options={chartStore.optionsBar} data={chartStore.dataBar}></Bar>
+                <ChartCards />
             </Col>
             <Col xs={{ span: 3, offset: 1 }}>
-                <InfoBlock desc={"Всего боксов"} count={chartStore.totalBoxNumber} />
-                <InfoBlock desc={"Свободно"} count={`${freePercent}%`} />
-                <InfoBlock desc={"Всего автомобилей"} count={chartStore.totalCarNumber} />
+                <InfoBlock desc={"Всего боксов"} count={dashboardStore.totalBoxNumber} />
+                <InfoBlock desc={"Свободно"} count={`${dashboardStore.freeBoxPercent}%`} />
+                <InfoBlock desc={"Всего автомобилей"} count={dashboardStore.totalCarNumber} />
             </Col>
         </Row>
     );

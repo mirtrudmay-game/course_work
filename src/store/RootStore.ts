@@ -6,7 +6,9 @@ import {FreeBoxesStore} from "./FreeBoxesStore";
 import {CarsStore} from "./CarsStore";
 import {FilesStore} from "./FilesStore";
 import {NewCarStore} from "./NewCarStore";
-import {ChartStore} from "./ChartStore";
+import {ChartDoughnutStore} from "../dashboard/store/ChartDoughnutStore";
+import {ChartBarStore} from "../dashboard/store/ChartBarStore";
+import {DashboardStore} from "../dashboard/store/Dashboard";
 
 export class RootStore {
     boxesStore: BoxesStore;
@@ -16,7 +18,9 @@ export class RootStore {
     carsStore: CarsStore;
     newCarStore: NewCarStore;
     filesStore: FilesStore;
-    chartStore: ChartStore;
+    chartDoughnutStore: ChartDoughnutStore;
+    chartBarStore: ChartBarStore;
+    dashboardStore: DashboardStore;
 
     constructor() {
         this.boxesStore = new BoxesStore(this);
@@ -26,7 +30,9 @@ export class RootStore {
         this.carsStore = new CarsStore(this);
         this.newCarStore = new NewCarStore(this);
         this.filesStore = new FilesStore(this);
-        this.chartStore = new ChartStore(this);
+        this.chartDoughnutStore = new ChartDoughnutStore(this);
+        this.chartBarStore = new ChartBarStore(this);
+        this.dashboardStore = new DashboardStore(this);
     }
 }
 

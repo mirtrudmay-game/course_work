@@ -14,8 +14,10 @@ const App = () => {
         <React.StrictMode>
             <BrowserRouter>
                 <Routes>
-                    <Route path="/" element={<Navigation />}>
+                    <Route path="/" element={<Navigation isShowMenu={false} />}>
                         <Route path="/" element={<WelcomePage />} />
+                    </Route>
+                    <Route path="/" element={<Navigation isShowMenu={true} />}>
                         <Route path="boxes" element={<Boxes />} />
                         <Route path="clients" element={<Clients />} />
                         <Route path="cars" element={<Cars />} />

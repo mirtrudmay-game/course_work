@@ -129,6 +129,7 @@ const NewRent = () => {
     };
 
     const onSelectRenter = (value: string | IOption | null) => {
+        debugger;
         if (!value) {
             setData({
                 ...data,
@@ -223,6 +224,7 @@ const NewRent = () => {
 
     async function onSubmit(id: number) {
         console.log(data, id);
+        debugger;
 
         await newCarStore.saveNewCar({ ...data, boxId: id });
 
