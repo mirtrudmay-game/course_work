@@ -42,6 +42,7 @@ export class NewCarStore implements ICarsStore {
             id_renter: +data.renter.value || null,
             id_model: +data.model.value,
             rental_start_date: this.getFormattedDate(new Date()),
+            receipt_number: +data.receiptNumber,
         };
 
         try {
@@ -50,7 +51,6 @@ export class NewCarStore implements ICarsStore {
                     full_name: data.renter.label,
                     phone: data.renterPhone,
                     address: data.renterAddress,
-                    receipt_number: +data.renterReceiptNumber,
                 };
 
                 console.log("Сохраняем клиента", renter);

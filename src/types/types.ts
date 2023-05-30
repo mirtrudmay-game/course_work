@@ -38,14 +38,12 @@ export interface IRenterResponse {
     full_name: string;
     phone: string;
     address: string;
-    receipt_number: number;
 }
 
 export interface IRenterCreate {
     full_name: string;
     phone: string;
     address: string;
-    receipt_number: number;
 }
 
 /**
@@ -59,6 +57,7 @@ export interface ICarResponse {
     renter_full_name: string;
     model_name: string;
     rental_start_date: string;
+    receipt_number: number;
 }
 
 export interface ICarCreate {
@@ -67,6 +66,7 @@ export interface ICarCreate {
     id_renter: number | null;
     id_model: number | null;
     rental_start_date: string;
+    receipt_number: number;
 }
 
 export interface IChartElement {

@@ -71,7 +71,7 @@ const Boxes = () => {
                                 <i className="bi-trash" />
                             </Button>
                         </Tooltip>
-                        <Tooltip text="Увеличить стоимость аренды всех боксов">
+                        <Tooltip text="Изменить стоимость аренды всех боксов">
                             <Button variant="outline-dark" className="me-2" onClick={increaseCostClickHandler}>
                                 <i className="bi-pen" />
                             </Button>
@@ -87,10 +87,6 @@ const Boxes = () => {
                             <Dropdown.Menu className={"mt-1"}>
                                 <FileMenuItem
                                     title={"О пустых боксах"}
-                                    onClick={() => filesStore.loadXml("free_boxes", null)}
-                                />
-                                <FileMenuItem
-                                    title={"О всех моделях машин"}
                                     onClick={() => filesStore.loadXml("free_boxes", null)}
                                 />
                                 <FileMenuItem

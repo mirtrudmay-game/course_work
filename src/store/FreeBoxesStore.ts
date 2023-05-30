@@ -42,7 +42,6 @@ export class FreeBoxesStore implements IBoxesStore {
     }
 
     setSelectedBox(index: number) {
-        debugger;
         this.selectedBoxId = index < 0 ? null : this.freeBoxesList[index].box_number;
     }
 }

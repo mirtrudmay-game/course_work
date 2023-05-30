@@ -3,7 +3,6 @@ import {RootStore} from "../../store/RootStore";
 
 interface IDashboardStore {
     totalBoxNumber: number;
-    freeBoxNumber: number;
     totalCarNumber: number;
 }
 
@@ -15,17 +14,24 @@ export class DashboardStore implements IDashboardStore {
         makeAutoObservable(this);
     }
 
-    loadData = async () => {
-        try {
-            runInAction(() => {});
-        } catch (e: any) {}
-    };
-
-    freeBoxNumber: number = 16;
-    totalBoxNumber: number = 45;
-    totalCarNumber: number = 20;
+    totalBoxNumber: number = 0;
+    totalCarNumber: number = 0;
 
     get freeBoxPercent(): number | string {
-        return Math.round((this.freeBoxNumber / this.totalBoxNumber) * 10000) / 100;
+        if (!this.totalBoxNumber) return 0;
+
+        return Math.round(((this.totalBoxNumber - this.totalCarNumber) / this.totalBoxNumber) * 10000) / 100;
     }
+
+    loadData = async () => {
+        const carsPromise = await this.rootStore.carsStore.loadAll();
+        const boxesPromise = await this.rootStore.boxesStore.loadAll();
+
+        Promise.all([carsPromise, boxesPromise]).then(() => {
+            runInAction(() => {
+                this.totalCarNumber = this.rootStore.carsStore.carsList.length;
+                this.totalBoxNumber = this.rootStore.boxesStore.boxesList.length;
+            });
+        });
+    };
 }

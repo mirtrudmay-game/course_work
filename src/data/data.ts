@@ -28,10 +28,6 @@ export const clientsTableColumns = [
         Header: "Адрес",
         accessor: "address",
     },
-    {
-        Header: "Квитанция",
-        accessor: "receipt_number",
-    },
 ];
 
 export const carsTableColumns = [
@@ -51,21 +47,38 @@ export const carsTableColumns = [
         Header: "Дата начала аренды",
         accessor: "rental_start_date",
     },
+    {
+        Header: "Квитанция",
+        accessor: "receipt_number",
+    },
 ];
 export const chartData: IChartElement[] = [
     {
         model_name: "Opel",
         count_box: 10,
-        count_car: 3,
+        count_car: 6,
+    },
+    {
+        model_name: "Volvo",
+        count_box: 3,
+        count_car: 1,
     },
     {
         model_name: "Ford",
-        count_box: 20,
-        count_car: 10,
+        count_box: 10,
+        count_car: 3,
     },
     {
         model_name: "Kia",
         count_box: 15,
-        count_car: 5,
+        count_car: 12,
+    },
+    {
+        model_name: "Lada",
+        count_box: 18,
+        count_car: 10,
     },
 ];
+
+// 56
+// 32

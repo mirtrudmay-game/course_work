@@ -3,7 +3,7 @@ import {Dropdown} from "react-bootstrap";
 
 export interface FileMenuItemProps {
     title: string;
-    onClick: () => Promise<void>;
+    onClick: () => Promise<void> | void;
     isDisabled?: boolean;
 }
 export const FileMenuItem: React.FC<FileMenuItemProps> = ({ title, onClick, isDisabled }) => {

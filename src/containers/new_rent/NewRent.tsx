@@ -18,7 +18,7 @@ export interface ICarCreateData {
     renter: IOption;
     renterPhone: string;
     renterAddress: string;
-    renterReceiptNumber: string;
+    receiptNumber: string;
     model: IOption;
     boxId: number | null;
 }
@@ -37,7 +37,7 @@ const initialCarData: ICarCreateData = {
     renter: new IOption("", ""),
     renterPhone: "",
     renterAddress: "",
-    renterReceiptNumber: "",
+    receiptNumber: "",
     model: new IOption("", ""),
     boxId: null,
 };
@@ -47,7 +47,6 @@ const initialCarErrors: ICarCreateError = {
     automobileNumberRegion: "",
     renter: "",
     renterPhone: "",
-    /*renterReceiptNumber: '',*/
     model: "",
 };
 
@@ -84,7 +83,6 @@ const NewRent = () => {
 
         const _errors = Object.assign({}, errors);
 
-        debugger;
         Object.keys(errors).forEach((key) => {
             if (["model", "renter"].includes(key)) {
                 // @ts-ignore
@@ -129,14 +127,12 @@ const NewRent = () => {
     };
 
     const onSelectRenter = (value: string | IOption | null) => {
-        debugger;
         if (!value) {
             setData({
                 ...data,
                 renter: new IOption("", ""),
                 renterPhone: "",
                 renterAddress: "",
-                renterReceiptNumber: "",
             });
             setClientEditable(false);
             setErrors({ ...errors, renter: "" });
@@ -151,7 +147,6 @@ const NewRent = () => {
                 renter: new IOption("", value),
                 renterPhone: "",
                 renterAddress: "",
-                renterReceiptNumber: "",
             });
             setClientEditable(true);
             return;
@@ -163,7 +158,6 @@ const NewRent = () => {
             renter: value,
             renterPhone: renter.phone,
             renterAddress: renter.address,
-            renterReceiptNumber: renter.receipt_number.toString(),
         });
         setClientEditable(false);
     };
@@ -222,11 +216,8 @@ const NewRent = () => {
         setShowFreeBoxesModal(false);
     };
 
-    async function onSubmit(id: number) {
-        console.log(data, id);
-        debugger;
-
-        await newCarStore.saveNewCar({ ...data, boxId: id });
+    async function onSubmit(id: number, receiptNumber: string) {
+        await newCarStore.saveNewCar({ ...data, boxId: id, receiptNumber: receiptNumber });
 
         closeFreeBoxesModal();
         setData(initialCarData);
@@ -245,6 +236,7 @@ const NewRent = () => {
                     <FormGroup className="mb-3">
                         <FormLabel className="required-p">Клиент</FormLabel>
                         <CreatableSelect
+                            formatCreateLabel={(inputText) => `Добавить "${inputText}"`}
                             styles={renterCustomStyles}
                             isClearable
                             onChange={(newValue) => onSelectRenter(newValue)}

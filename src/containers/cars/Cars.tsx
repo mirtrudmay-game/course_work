@@ -9,10 +9,11 @@ import ErrorModal from "../../components/modals/ErrorModal";
 import {useStores} from "../../store/RootStore";
 import {observer} from "mobx-react-lite";
 import {Link} from "react-router-dom";
+import {FileMenuItem} from "../../components/FileMenuItem";
 
 export type CarsProps = {};
 const Cars: React.FC<CarsProps> = ({}) => {
-    const { carsStore } = useStores();
+    const { carsStore, filesStore } = useStores();
 
     useEffect(() => {
         carsStore.loadAll();
@@ -34,7 +35,7 @@ const Cars: React.FC<CarsProps> = ({}) => {
                         <Tooltip text="Новый автомобиль">
                             <Button variant="success" className="me-2">
                                 <Link to="/new-rent">
-                                    <i className="bi-plus-lg"></i>
+                                    <i className="bi-plus-lg text-white"></i>
                                 </Link>
                             </Button>
                         </Tooltip>
@@ -58,6 +59,18 @@ const Cars: React.FC<CarsProps> = ({}) => {
                                     <i className="bi bi-filetype-xls"></i>
                                 </Dropdown.Toggle>
                             </Tooltip>
+
+                            <Dropdown.Menu>
+                                <FileMenuItem
+                                    title={"Квитанция на оплату аренды выбранной машины"}
+                                    isDisabled={!carsStore.selectedCarId}
+                                    onClick={() =>
+                                        filesStore.loadXml(`amount`, {
+                                            car_number: carsStore.selectedCarId,
+                                        })
+                                    }
+                                />
+                            </Dropdown.Menu>
                         </Dropdown>
                     </ButtonToolbar>
                 </Row>

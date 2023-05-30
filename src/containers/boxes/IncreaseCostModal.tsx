@@ -8,14 +8,14 @@ export interface IModal {
     closeCallback: () => void;
 }
 
-export const IncreaseCostModal:FC<IModal> = ({ show, closeCallback})  => {
+export const IncreaseCostModal: FC<IModal> = ({ show, closeCallback }) => {
     const { boxesStore, modelsStore } = useStores();
 
     const [coefficient, setCoefficient] = useState<number>(1);
 
     const onCoefficientChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         setCoefficient(+event.target.value);
-    }
+    };
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -24,20 +24,21 @@ export const IncreaseCostModal:FC<IModal> = ({ show, closeCallback})  => {
         closeCallback();
     };
 
-
     return (
         <Modal show={show} onHide={closeCallback}>
             <Modal.Header closeButton>
-                <Modal.Title>Увеличить стоимость</Modal.Title>
+                <Modal.Title>Изменить стоимость аренды</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit}>
                     <Form.Group className="mb-3">
-                        <Form.Label>Введите количество раз (можно дробное), в которое необходимо увеличить стоимость: </Form.Label>
+                        <Form.Label>
+                            Введите количество раз (можно дробное), в которое необходимо увеличить / уменьшить
+                            стоимость:{" "}
+                        </Form.Label>
                         <Form.Control
                             type="number"
                             step="0.1"
-                            min="1"
                             onChange={onCoefficientChangeHandler}
                             value={coefficient}
                         />
@@ -47,4 +48,4 @@ export const IncreaseCostModal:FC<IModal> = ({ show, closeCallback})  => {
             </Modal.Body>
         </Modal>
     );
-}
+};

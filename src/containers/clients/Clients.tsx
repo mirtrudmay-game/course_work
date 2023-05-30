@@ -8,10 +8,13 @@ import {IRenterResponse} from "../../types/types";
 import ClientEditModal from "./ClientEditModal";
 import {Tooltip} from "../../components/Tooltip";
 import {useStores} from "../../store/RootStore";
+import {FileMenuItem} from "../../components/FileMenuItem";
+import {SelectModelModal} from "./SelectModelModal";
 
 const Clients = () => {
-    const { clientsStore } = useStores();
+    const { clientsStore, filesStore } = useStores();
     const [showEditModal, setShowEditModal] = useState<boolean>(false);
+    const [showSelectModelModal, setShowSelectModelModal] = useState<boolean>(false);
 
     useEffect(() => {
         clientsStore.loadAll();
@@ -28,6 +31,14 @@ const Clients = () => {
     const selectRow = (index: number) => {
         clientsStore.setSelectedClient(index);
     };
+
+    function showModelsModal() {
+        setShowSelectModelModal(true);
+    }
+
+    function closeModelsModal() {
+        setShowSelectModelModal(false);
+    }
 
     return (
         <>
@@ -52,11 +63,19 @@ const Clients = () => {
                         </Tooltip>
 
                         <Dropdown.Menu>
-                            <Dropdown.Item href="#/action-1">О всех клиентах</Dropdown.Item>
-                            <Dropdown.Item href="#/action-2">О клиентах по марке автомобиля</Dropdown.Item>
-                            <Dropdown.Item href="#/action-3" disabled={!clientsStore.selectedClient}>
-                                О выбранном клиенте
-                            </Dropdown.Item>
+                            <FileMenuItem
+                                title={"О всех клиентах"}
+                                onClick={() => filesStore.loadXml("all_clients", null)}
+                            />
+
+                            <FileMenuItem title={"О клиентах по модели автомобиля"} onClick={showModelsModal} />
+                            <FileMenuItem
+                                title={"О выбранном клиенте"}
+                                isDisabled={!clientsStore.selectedClient}
+                                onClick={() =>
+                                    filesStore.loadXml(`client_in_box`, { box_number: clientsStore.selectedClient })
+                                }
+                            />
                         </Dropdown.Menu>
                     </Dropdown>
                 </ButtonToolbar>
@@ -80,6 +99,7 @@ const Clients = () => {
                     initialData={clientsStore.selectedClient}
                 />
             )}
+            {showSelectModelModal && <SelectModelModal isShow={showSelectModelModal} onClose={closeModelsModal} />}
 
             {/*<SuccessModal
                 show={!!clientsStore.successMessage}

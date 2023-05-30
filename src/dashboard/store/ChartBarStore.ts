@@ -2,19 +2,29 @@ import {makeAutoObservable, runInAction} from "mobx";
 import {RootStore} from "../../store/RootStore";
 import {ChartData, ChartOptions} from "chart.js";
 import {IChartElement} from "../../types/types";
-import {chartData} from "../../data/data";
+import axios from "axios";
 
 interface IChartBarStore {
     data: ChartData<"bar">;
     options: ChartOptions<"bar">;
+    totalBoxNumber: number;
+    totalCarNumber: number;
 }
 
 export class ChartBarStore implements IChartBarStore {
+    totalBoxNumber: number = 0;
+    totalCarNumber: number = 0;
     options: ChartOptions<"bar"> = {};
     data: ChartData<"bar"> = {
         labels: [],
         datasets: [],
     };
+
+    get freeBoxPercent(): number | string {
+        if (!this.totalBoxNumber) return 0;
+
+        return Math.round(((this.totalBoxNumber - this.totalCarNumber) / this.totalBoxNumber) * 10000) / 100;
+    }
 
     private rootStore: RootStore;
 
@@ -25,11 +35,16 @@ export class ChartBarStore implements IChartBarStore {
 
     loadData = async () => {
         try {
-            // const {data} = await axios.get<IChartElement[]>("/data-service/...");
-            const data = chartData;
+            const carsPromise = await this.rootStore.carsStore.loadAll();
+            const boxesPromise = await this.rootStore.boxesStore.loadAll();
+            const chartPromise = await axios.get<IChartElement[]>("/data-service/models/report");
 
-            runInAction(() => {
-                this.data = this.formatData(data);
+            Promise.all([carsPromise, boxesPromise]).then(() => {
+                runInAction(() => {
+                    this.totalCarNumber = this.rootStore.carsStore.carsList.length;
+                    this.totalBoxNumber = this.rootStore.boxesStore.boxesList.length;
+                    this.data = this.formatData(chartPromise.data);
+                });
             });
         } catch (e: any) {}
     };
